@@ -14,22 +14,35 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .status-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:#1a3a2a;color:#3fb950;border:1px solid #238636}
 .refresh-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px}
 .refresh-btn:hover{background:#30363d;color:#e6edf3}
+.sound-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px}
+.sound-btn.on{color:#3fb950;border-color:#238636}
 .header-right{display:flex;align-items:center;gap:10px}
 .last-update{font-size:11px;color:#7d8590}
-
 .fighter-row{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;margin-bottom:16px}
 .fighter{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px}
 .fighter.teresa{border-top:3px solid #f85149}
 .fighter.omar{border-top:3px solid #388bfd}
-.f-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+.fighter-inner{display:flex;gap:14px;align-items:flex-start}
+.avatar{flex-shrink:0;width:76px;height:76px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.avatar.t{background:#1a0505;border:2px solid #f85149}
+.avatar.o{background:#05050f;border:2px solid #388bfd}
+.avatar-letter{font-size:34px;font-weight:700;line-height:1}
+.avatar.t .avatar-letter{color:#f85149}
+.avatar.o .avatar-letter{color:#388bfd}
+.avatar-sub{font-size:9px;font-weight:600;letter-spacing:0.1em;margin-top:2px}
+.avatar.t .avatar-sub{color:#f8514980}
+.avatar.o .avatar-sub{color:#388bfd80}
+.avatar-badge{position:absolute;top:-6px;right:-6px;font-size:14px}
+.fighter-stats{flex:1;min-width:0}
+.f-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
 .f-label.t{color:#f85149}
 .f-label.o{color:#388bfd}
-.f-value{font-size:32px;font-weight:600;color:#e6edf3;line-height:1;margin-bottom:6px}
-.f-pnl{font-size:14px;font-weight:500;margin-bottom:10px}
+.f-value{font-size:28px;font-weight:600;color:#e6edf3;line-height:1;margin-bottom:4px}
+.f-pnl{font-size:13px;font-weight:500;margin-bottom:6px}
 .f-pnl.up{color:#3fb950}.f-pnl.dn{color:#f85149}.f-pnl.flat{color:#7d8590}
-.f-meta{font-size:12px;color:#7d8590;line-height:1.8}
+.f-meta{font-size:11px;color:#7d8590;line-height:1.8}
 .trait{display:flex;align-items:center;gap:6px;font-size:11px;color:#8b949e;margin-top:5px}
-.dot{width:5px;height:5px;border-radius:50%}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .dot.t{background:#f85149}.dot.o{background:#388bfd}
 .vs-col{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 .vs-txt{font-size:24px;font-weight:600;color:#30363d}
@@ -39,7 +52,6 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .vs-ldr.o{background:#1a2030;color:#388bfd;border:1px solid #1f3a6e}
 .vs-ldr.tie{background:#1c1c1c;color:#7d8590;border:1px solid #30363d}
 .win-badge{display:inline-block;font-size:9px;font-weight:600;background:#1a2f1a;color:#3fb950;border:1px solid #238636;border-radius:10px;padding:2px 7px;margin-left:6px;vertical-align:middle}
-
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 .metric{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px}
 .m-label{font-size:10px;color:#7d8590;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
@@ -47,7 +59,6 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .m-sub{font-size:10px;color:#7d8590;margin-top:4px}
 .fg-bar{height:4px;background:#21262d;border-radius:2px;margin:8px 0 4px;overflow:hidden}
 .fg-fill{height:100%;border-radius:2px;transition:width 0.6s}
-
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
 .panel{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px}
 .p-title{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7d8590;margin-bottom:12px}
@@ -74,17 +85,13 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .h-pnl.up{color:#3fb950}.h-pnl.dn{color:#f85149}
 .cash-row{display:flex;justify-content:space-between;padding:8px 0 0;border-top:1px solid #21262d;margin-top:8px;font-size:12px}
 .empty{font-size:12px;color:#7d8590;text-align:center;padding:20px 0}
-
 .chart-panel{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;margin-bottom:16px}
 .chart-legend{display:flex;gap:16px;margin-bottom:12px}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#8b949e}
 .leg-dot{width:12px;height:3px;border-radius:2px}
-
 .banter{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px}
-.banter-icon{font-size:24px;flex-shrink:0}
 .b-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#f0883e;margin-bottom:5px}
 .b-text{font-size:14px;color:#e6edf3;font-style:italic;line-height:1.6}
-
 .threat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #21262d;font-size:12px}
 .threat-row:last-child{border-bottom:none}
 .thr-name{color:#8b949e}
@@ -92,7 +99,6 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .thr-lvl.high{background:#2a1a1a;color:#f85149;border:1px solid #6e2020}
 .thr-lvl.medium{background:#2a1f0a;color:#f0883e;border:1px solid #6e4a0a}
 .thr-lvl.low{background:#1a2f1a;color:#3fb950;border:1px solid #238636}
-
 .result-big{font-size:24px;font-weight:600;text-align:center;padding:12px 0 4px}
 .result-sub{font-size:11px;color:#7d8590;text-align:center;margin-bottom:16px}
 .score-table{width:100%;border-collapse:collapse;font-size:12px}
@@ -101,69 +107,97 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .score-table td{padding:7px 0;color:#8b949e}
 .score-table td:last-child,.score-table td:nth-child(2){text-align:right;color:#e6edf3;font-weight:500}
 .score-total td{border-top:1px solid #30363d;padding-top:10px;color:#e6edf3}
+.notif{position:fixed;top:20px;right:20px;background:#161b22;border:1px solid #30363d;border-radius:10px;padding:14px 18px;font-size:13px;color:#e6edf3;z-index:999;opacity:0;transition:opacity 0.3s;max-width:280px;pointer-events:none}
+.notif.show{opacity:1}
+.notif.buy{border-left:3px solid #3fb950}
+.notif.sell{border-left:3px solid #f85149}
+.notif.win{border-left:3px solid #f0883e}
 </style>
 </head>
 <body>
 
+<div class="notif" id="notif"></div>
+
 <div class="header">
   <div>
-    <div class="title">⚔️ Battle Bots War Room</div>
-    <div class="subtitle">Husband vs Wife AI Crypto Battle — Real Money on Coinbase</div>
+    <div class="title">&#9876; Battle Bots War Room</div>
+    <div class="subtitle">Husband vs Wife AI Crypto Battle &mdash; Real Money on Coinbase</div>
   </div>
   <div class="header-right">
-    <div class="status-pill" id="statusPill">● Live</div>
+    <div class="status-pill">&#9679; Live</div>
     <div class="last-update" id="lastUpdate">Loading...</div>
-    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+    <button class="sound-btn on" id="soundBtn" onclick="toggleSound()">&#128266;</button>
+    <button class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
   </div>
 </div>
 
 <div class="fighter-row">
   <div class="fighter teresa">
-    <div class="f-label t">Teresa — Momentum <span id="tWinBadge" class="win-badge" style="display:none">WINNING</span></div>
-    <div class="f-value" id="tVal">—</div>
-    <div class="f-pnl flat" id="tPnl">—</div>
-    <div class="f-meta" id="tMeta">Cash: — | Trades: —</div>
-    <div class="f-meta" id="tLast" style="margin-top:4px">—</div>
+    <div class="fighter-inner">
+      <div class="avatar t">
+        <div class="avatar-badge">&#9889;</div>
+        <div class="avatar-letter">T</div>
+        <div class="avatar-sub">MOMENTUM</div>
+      </div>
+      <div class="fighter-stats">
+        <div class="f-label t">Teresa <span id="tWinBadge" class="win-badge" style="display:none">WINNING</span></div>
+        <div class="f-value" id="tVal">&#8212;</div>
+        <div class="f-pnl flat" id="tPnl">&#8212;</div>
+        <div class="f-meta" id="tMeta">Cash: &#8212; | Trades: &#8212;</div>
+        <div class="f-meta" id="tLast">&#8212;</div>
+      </div>
+    </div>
     <div style="margin-top:12px">
       <div class="trait"><span class="dot t"></span>Buys strength, rides momentum</div>
       <div class="trait"><span class="dot t"></span>Cuts losers fast at -7%</div>
       <div class="trait"><span class="dot t"></span>Takes profit at +15%</div>
+      <div style="margin-top:8px;font-size:10px;color:#f85149;font-style:italic">&#8220;Trend is my friend&#8221;</div>
     </div>
   </div>
   <div class="vs-col">
     <div class="vs-txt">VS</div>
-    <div class="vs-gap" id="vsGap">—</div>
+    <div class="vs-gap" id="vsGap">&#8212;</div>
     <div class="vs-ldr tie" id="vsLdr">Tied</div>
   </div>
   <div class="fighter omar">
-    <div class="f-label o">Omar — Long Hold <span id="oWinBadge" class="win-badge" style="display:none">WINNING</span></div>
-    <div class="f-value" id="oVal">—</div>
-    <div class="f-pnl flat" id="oPnl">—</div>
-    <div class="f-meta" id="oMeta">Cash: — | Trades: —</div>
-    <div class="f-meta" id="oLast" style="margin-top:4px">—</div>
+    <div class="fighter-inner">
+      <div class="avatar o">
+        <div class="avatar-badge">&#10052;</div>
+        <div class="avatar-letter">O</div>
+        <div class="avatar-sub">LONG HOLD</div>
+      </div>
+      <div class="fighter-stats">
+        <div class="f-label o">Omar <span id="oWinBadge" class="win-badge" style="display:none">WINNING</span></div>
+        <div class="f-value" id="oVal">&#8212;</div>
+        <div class="f-pnl flat" id="oPnl">&#8212;</div>
+        <div class="f-meta" id="oMeta">Cash: &#8212; | Trades: &#8212;</div>
+        <div class="f-meta" id="oLast">&#8212;</div>
+      </div>
+    </div>
     <div style="margin-top:12px">
       <div class="trait"><span class="dot o"></span>Accumulates on dips</div>
-      <div class="trait"><span class="dot o"></span>Patient — 18% stop only</div>
+      <div class="trait"><span class="dot o"></span>Patient &mdash; 18% stop only</div>
       <div class="trait"><span class="dot o"></span>Holds through the noise</div>
+      <div style="margin-top:8px;font-size:10px;color:#388bfd;font-style:italic">&#8220;Time in &gt; timing&#8221;</div>
     </div>
   </div>
 </div>
 
 <div class="metrics">
   <div class="metric">
-    <div class="m-label">Fear & Greed</div>
-    <div class="m-value" id="fgVal">—</div>
+    <div class="m-label">Fear &amp; Greed</div>
+    <div class="m-value" id="fgVal">&#8212;</div>
     <div class="fg-bar"><div class="fg-fill" id="fgFill" style="width:0%;background:#3fb950"></div></div>
-    <div class="m-sub" id="fgLbl">—</div>
+    <div class="m-sub" id="fgLbl">&#8212;</div>
   </div>
   <div class="metric">
     <div class="m-label">BTC Dominance</div>
-    <div class="m-value" id="btcDom">—</div>
+    <div class="m-value" id="btcDom">&#8212;</div>
     <div class="m-sub">of total crypto market</div>
   </div>
   <div class="metric">
     <div class="m-label">Total Market Cap</div>
-    <div class="m-value" id="mcap">—</div>
+    <div class="m-value" id="mcap">&#8212;</div>
     <div class="m-sub">all crypto combined</div>
   </div>
   <div class="metric">
@@ -175,7 +209,7 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 
 <div class="grid2">
   <div class="panel">
-    <div class="p-title">Live Prices — Battle Coins</div>
+    <div class="p-title">Live Prices &mdash; Battle Coins</div>
     <div id="priceList"><div class="empty">Loading prices...</div></div>
   </div>
   <div class="panel">
@@ -186,14 +220,14 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 
 <div class="grid2">
   <div class="panel">
-    <div class="p-title">Teresa — Open Positions</div>
+    <div class="p-title">Teresa &mdash; Open Positions</div>
     <div id="tHoldings"><div class="empty">No open positions</div></div>
-    <div class="cash-row"><span style="color:#7d8590">Cash available</span><span style="color:#e6edf3" id="tCash">—</span></div>
+    <div class="cash-row"><span style="color:#7d8590">Cash available</span><span style="color:#e6edf3" id="tCash">&#8212;</span></div>
   </div>
   <div class="panel">
-    <div class="p-title">Omar — Open Positions</div>
+    <div class="p-title">Omar &mdash; Open Positions</div>
     <div id="oHoldings"><div class="empty">Waiting for dips to accumulate</div></div>
-    <div class="cash-row"><span style="color:#7d8590">Cash available</span><span style="color:#e6edf3" id="oCash">—</span></div>
+    <div class="cash-row"><span style="color:#7d8590">Cash available</span><span style="color:#e6edf3" id="oCash">&#8212;</span></div>
   </div>
 </div>
 
@@ -204,12 +238,12 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
     <div class="leg-item"><div class="leg-dot" style="background:#388bfd"></div>Omar (Long Hold)</div>
   </div>
   <div style="position:relative;width:100%;height:220px">
-    <canvas id="perfChart" role="img" aria-label="Line chart comparing Teresa and Omar portfolio values over time">Portfolio performance loading.</canvas>
+    <canvas id="perfChart" role="img" aria-label="Portfolio performance chart">Portfolio performance loading.</canvas>
   </div>
 </div>
 
 <div class="banter">
-  <div class="banter-icon">😂</div>
+  <div style="font-size:24px;flex-shrink:0">&#128514;</div>
   <div>
     <div class="b-label">Battle Banter</div>
     <div class="b-text" id="banterText">Loading today's commentary...</div>
@@ -219,23 +253,21 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 <div class="grid2">
   <div class="panel">
     <div class="p-title">Market Threat Radar</div>
-    <div id="threatList">
-      <div class="threat-row"><span class="thr-name">CPI / Inflation data</span><span class="thr-lvl medium">Medium</span></div>
-      <div class="threat-row"><span class="thr-name">Fed rate signals</span><span class="thr-lvl medium">Medium</span></div>
-      <div class="threat-row"><span class="thr-name">BTC ETF net flows</span><span class="thr-lvl low">Low</span></div>
-      <div class="threat-row"><span class="thr-name">Crypto regulation news</span><span class="thr-lvl medium">Medium</span></div>
-      <div class="threat-row"><span class="thr-name">Altcoin liquidations</span><span class="thr-lvl" id="liqLevel">Low</span></div>
-    </div>
+    <div class="threat-row"><span class="thr-name">CPI / Inflation data</span><span class="thr-lvl medium">Medium</span></div>
+    <div class="threat-row"><span class="thr-name">Fed rate signals</span><span class="thr-lvl medium">Medium</span></div>
+    <div class="threat-row"><span class="thr-name">BTC ETF net flows</span><span class="thr-lvl low">Low</span></div>
+    <div class="threat-row"><span class="thr-name">Crypto regulation news</span><span class="thr-lvl medium">Medium</span></div>
+    <div class="threat-row"><span class="thr-name">Altcoin liquidations</span><span class="thr-lvl" id="liqLevel">Low</span></div>
   </div>
   <div class="panel">
     <div class="p-title">Today's Battle Result</div>
-    <div class="result-big" id="battleResult">—</div>
+    <div class="result-big" id="battleResult">&#8212;</div>
     <div class="result-sub" id="battleSub">Loading...</div>
     <table class="score-table">
-      <tr><td>Portfolio</td><td id="sc1T">—</td><td id="sc1O">—</td></tr>
-      <tr><td>P&L</td><td id="sc2T">—</td><td id="sc2O">—</td></tr>
-      <tr><td>Trades</td><td id="sc3T">—</td><td id="sc3O">—</td></tr>
-      <tr class="score-total"><td>Leader</td><td colspan="2" id="scLdr" style="text-align:right">—</td></tr>
+      <tr><td>Portfolio</td><td id="sc1T">&#8212;</td><td id="sc1O">&#8212;</td></tr>
+      <tr><td>P&amp;L</td><td id="sc2T">&#8212;</td><td id="sc2O">&#8212;</td></tr>
+      <tr><td>Trades</td><td id="sc3T">&#8212;</td><td id="sc3O">&#8212;</td></tr>
+      <tr class="score-total"><td>Leader</td><td colspan="2" id="scLdr" style="text-align:right">&#8212;</td></tr>
     </table>
   </div>
 </div>
@@ -257,13 +289,32 @@ const BANTERS=[
   "Long Hold conviction: immovable. Teresa conviction: recalibrating every 4 hours.",
   "BTC didn't move much today. Omar called it a win. Teresa called it an insult.",
   "The agents disagree on strategy but agree the market owes them an apology.",
+  "Teresa is playing chess. Omar is playing the long game. The market is playing Calvinball.",
+  "Momentum entered with a battle cry. Long Hold entered with a spreadsheet from 2019.",
 ];
-let perfChart=null;
-let livePrices={};
+
+let perfChart=null,livePrices={},soundOn=true,lastTradeCount=0,lastLeader='',audioCtx=null;
+
+function getAC(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
+function tone(f,d,t,v){try{const c=getAC(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=t||'square';o.frequency.value=f;g.gain.setValueAtTime(v||0.12,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);o.start();o.stop(c.currentTime+d)}catch(e){}}
+function playBuy(){if(!soundOn)return;tone(523,0.1);setTimeout(()=>tone(659,0.1),100);setTimeout(()=>tone(784,0.15),200)}
+function playSell(){if(!soundOn)return;tone(784,0.1);setTimeout(()=>tone(659,0.1),100);setTimeout(()=>tone(523,0.15),200)}
+function playLevelUp(){if(!soundOn)return;[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.12),i*120))}
+function playClick(){if(!soundOn)return;tone(440,0.05,'sine',0.07)}
+
+function toggleSound(){soundOn=!soundOn;const b=document.getElementById('soundBtn');b.innerHTML=soundOn?'&#128266;':'&#128263;';b.className=soundOn?'sound-btn on':'sound-btn'}
+
+function showNotif(msg,type){const el=document.getElementById('notif');el.textContent=msg;el.className='notif show '+(type||'');clearTimeout(el._t);el._t=setTimeout(()=>el.className='notif',3500)}
 
 function fmt(n){return'$'+parseFloat(n).toFixed(2)}
 function fmtPnl(n){n=parseFloat(n);return(n>=0?'+':'')+fmt(Math.abs(n))}
 function fmtPct(n){n=parseFloat(n);return(n>=0?'+':'')+n.toFixed(2)+'%'}
+
+function parseTime(t){
+  if(!t)return null;
+  const d=new Date(t.toString().replace(' ','T'));
+  return isNaN(d.getTime())?null:d;
+}
 
 async function loadSheet(){
   try{
@@ -302,48 +353,38 @@ async function loadPrices(){
   return res;
 }
 
-async function loadFG(){
-  try{const r=await fetch('https://api.alternative.me/fng/?limit=1');const d=await r.json();return d.data&&d.data[0]?d.data[0]:null}catch(e){return null}
-}
-
-async function loadPaprika(){
-  try{const r=await fetch('https://api.coinpaprika.com/v1/global');return await r.json()}catch(e){return null}
-}
+async function loadFG(){try{const r=await fetch('https://api.alternative.me/fng/?limit=1');const d=await r.json();return d.data&&d.data[0]?d.data[0]:null}catch(e){return null}}
+async function loadPaprika(){try{const r=await fetch('https://api.coinpaprika.com/v1/global');if(!r.ok)return null;return await r.json()}catch(e){return null}}
 
 function buildHoldings(trades){
   const h={};
   trades.forEach(t=>{
-    if(t.action==='BUY'){
-      if(!h[t.coin])h[t.coin]={qty:0,avgPrice:0,totalCost:0};
-      h[t.coin].totalCost+=t.tradeVal;h[t.coin].qty+=t.qty;
-      h[t.coin].avgPrice=h[t.coin].totalCost/h[t.coin].qty;
-    }else if(t.action==='SELL'){delete h[t.coin]}
+    if(t.action==='BUY'){if(!h[t.coin])h[t.coin]={qty:0,avgPrice:0,totalCost:0};h[t.coin].totalCost+=t.tradeVal;h[t.coin].qty+=t.qty;h[t.coin].avgPrice=h[t.coin].totalCost/h[t.coin].qty}
+    else if(t.action==='SELL'){delete h[t.coin]}
   });
   return h;
 }
 
-function renderHoldings(elId,holdings,prices){
-  const el=document.getElementById(elId);
-  const coins=Object.keys(holdings);
+function renderHoldings(id,h,p){
+  const el=document.getElementById(id);
+  const coins=Object.keys(h);
   if(!coins.length){el.innerHTML='<div class="empty">No open positions</div>';return}
-  el.innerHTML=coins.map(coin=>{
-    const h=holdings[coin],p=prices[coin];
-    const val=p?h.qty*p.price:h.qty*h.avgPrice;
-    const pnl=val-h.totalCost,pct=h.totalCost>0?(pnl/h.totalCost*100):0;
-    const c=pnl>=0?'up':'dn';
-    return'<div class="h-row"><div><div class="h-coin">'+coin+'</div><div class="h-det">'+h.qty.toFixed(6)+' @ '+fmt(h.avgPrice)+'</div></div>'
-      +'<div><div class="h-val">'+fmt(val)+'</div><div class="h-pnl '+c+'">'+fmtPnl(pnl)+' ('+fmtPct(pct)+')</div></div></div>';
+  el.innerHTML=coins.map(c=>{
+    const hh=h[c],pp=p[c];
+    const val=pp?hh.qty*pp.price:hh.qty*hh.avgPrice;
+    const pnl=val-hh.totalCost,pct=hh.totalCost>0?(pnl/hh.totalCost*100):0;
+    return'<div class="h-row"><div><div class="h-coin">'+c+'</div><div class="h-det">'+hh.qty.toFixed(6)+' @ '+fmt(hh.avgPrice)+'</div></div><div><div class="h-val">'+fmt(val)+'</div><div class="h-pnl '+(pnl>=0?'up':'dn')+'">'+fmtPnl(pnl)+' ('+fmtPct(pct)+')</div></div></div>';
   }).join('');
 }
 
-function renderPrices(prices){
+function renderPrices(p){
   const el=document.getElementById('priceList');
-  const coins=Object.keys(prices);
+  const coins=Object.keys(p);
   if(!coins.length){el.innerHTML='<div class="empty">Prices unavailable</div>';return}
-  el.innerHTML=coins.map(coin=>{
-    const p=prices[coin],c=p.change>=0?'up':'dn',s=p.change>=0?'+':'';
-    const pStr=p.price>100?'$'+p.price.toLocaleString(undefined,{maximumFractionDigits:0}):'$'+p.price.toFixed(4);
-    return'<div class="price-row"><span class="p-coin">'+coin+'</span><span class="p-val">'+pStr+'</span><span class="p-chg '+c+'">'+s+p.change.toFixed(2)+'%</span></div>';
+  el.innerHTML=coins.map(c=>{
+    const pp=p[c],cls=pp.change>=0?'up':'dn',s=pp.change>=0?'+':'';
+    const pStr=pp.price>100?'$'+pp.price.toLocaleString(undefined,{maximumFractionDigits:0}):'$'+pp.price.toFixed(4);
+    return'<div class="price-row"><span class="p-coin">'+c+'</span><span class="p-val">'+pStr+'</span><span class="p-chg '+cls+'">'+s+pp.change.toFixed(2)+'%</span></div>';
   }).join('');
 }
 
@@ -353,9 +394,7 @@ function renderTrades(trades){
   if(!recent.length){el.innerHTML='<div class="empty">No trades yet</div>';return}
   el.innerHTML=recent.map(t=>{
     const ac=t.action.toLowerCase(),wc=t.agent==='TERESA'?'t':'o';
-    return'<div class="trade-row"><span class="tbadge '+ac+'">'+t.action+'</span>'
-      +'<div><div class="t-main"><span class="t-who '+wc+'">'+t.agent+'</span> — '+t.coin+' @ '+fmt(t.price)+'</div>'
-      +'<div class="t-note">'+t.notes+'</div></div></div>';
+    return'<div class="trade-row"><span class="tbadge '+ac+'">'+t.action+'</span><div><div class="t-main"><span class="t-who '+wc+'">'+t.agent+'</span> &mdash; '+t.coin+' @ '+fmt(t.price)+'</div><div class="t-note">'+t.notes+'</div></div></div>';
   }).join('');
 }
 
@@ -363,20 +402,31 @@ function renderChart(tT,oT){
   const canvas=document.getElementById('perfChart');
   if(!canvas)return;
   if(perfChart)perfChart.destroy();
-  const times=[...new Set([...tT.map(t=>t.time),...oT.map(t=>t.time)])].sort();
-  const labels=['Start',...times.map(t=>{if(!t)return'';const d=new Date(t);return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})})];
-  function series(trades){const v=[250];trades.forEach(t=>v.push(t.portVal));while(v.length<labels.length)v.push(v[v.length-1]);return v}
+  const allTimes=[...new Set([...tT.map(t=>t.time),...oT.map(t=>t.time)])].sort();
+  const labels=['Start',...allTimes.map(t=>{
+    const d=parseTime(t);
+    if(!d)return'?';
+    return(d.getMonth()+1)+'/'+d.getDate()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  })];
+  function series(trades){
+    const v=[250];
+    allTimes.forEach(time=>{
+      const match=trades.filter(t=>t.time===time);
+      v.push(match.length?match[match.length-1].portVal:v[v.length-1]);
+    });
+    return v;
+  }
   perfChart=new Chart(canvas,{
     type:'line',
     data:{labels,datasets:[
-      {label:'Teresa',data:series(tT),borderColor:'#f85149',borderWidth:2,pointRadius:2,tension:0.3,fill:false},
-      {label:'Omar',data:series(oT),borderColor:'#388bfd',borderWidth:2,pointRadius:2,tension:0.3,fill:false,borderDash:[5,3]}
+      {label:'Teresa',data:series(tT),borderColor:'#f85149',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
+      {label:'Omar',data:series(oT),borderColor:'#388bfd',borderWidth:2,pointRadius:3,tension:0.3,fill:false,borderDash:[5,3]}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toFixed(2)}}},
       scales:{
         y:{ticks:{callback:v=>'$'+v.toFixed(0),color:'#7d8590',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'},border:{color:'#21262d'}},
-        x:{ticks:{color:'#7d8590',font:{size:10},maxTicksLimit:6,autoSkip:true},grid:{display:false},border:{color:'#21262d'}}
+        x:{ticks:{color:'#7d8590',font:{size:10},maxTicksLimit:5,autoSkip:true},grid:{display:false},border:{color:'#21262d'}}
       }
     }
   });
@@ -384,6 +434,7 @@ function renderChart(tT,oT){
 
 async function loadAll(){
   document.getElementById('lastUpdate').textContent='Refreshing...';
+  playClick();
   const[sheet,prices,fg,paprika]=await Promise.all([loadSheet(),loadPrices(),loadFG(),loadPaprika()]);
   livePrices=prices;
 
@@ -402,7 +453,6 @@ async function loadAll(){
     if(paprika.bitcoin_dominance_percentage)document.getElementById('btcDom').textContent=paprika.bitcoin_dominance_percentage.toFixed(1)+'%';
     if(paprika.market_cap_usd)document.getElementById('mcap').textContent='$'+(paprika.market_cap_usd/1e12).toFixed(2)+'T';
   }
-
   renderPrices(prices);
 
   let tS={value:250,cash:250,pnl:0,pnlPct:0,trades:0,last:'No trades yet',holdings:{}};
@@ -410,6 +460,14 @@ async function loadAll(){
 
   if(sheet){
     const{trades,tT,oT,tLast,oLast}=sheet;
+    const newCount=trades.length;
+    if(lastTradeCount>0&&newCount>lastTradeCount){
+      const newest=trades[trades.length-1];
+      if(newest.action==='BUY'){playBuy();showNotif('BUY '+newest.agent+' '+newest.coin+' @ '+fmt(newest.price),'buy')}
+      else{playSell();showNotif('SELL '+newest.agent+' '+newest.coin+' @ '+fmt(newest.price),'sell')}
+    }
+    lastTradeCount=newCount;
+
     if(tLast){
       tS.cash=tLast.cash;tS.trades=tLast.trades;
       tS.last='Last: '+tLast.action+' '+tLast.coin+' @ '+fmt(tLast.price);
@@ -445,27 +503,32 @@ async function loadAll(){
   const margin=Math.abs(tS.value-oS.value);
   document.getElementById('vsGap').textContent=margin<0.01?'Dead even':'$'+margin.toFixed(2)+' gap';
   const ldr=document.getElementById('vsLdr');
-  if(tS.value>oS.value){ldr.textContent='Teresa Leading';ldr.className='vs-ldr t';document.getElementById('tWinBadge').style.display='inline';document.getElementById('oWinBadge').style.display='none'}
-  else if(oS.value>tS.value){ldr.textContent='Omar Leading';ldr.className='vs-ldr o';document.getElementById('oWinBadge').style.display='inline';document.getElementById('tWinBadge').style.display='none'}
+  let newLeader='tie';
+  if(tS.value>oS.value){ldr.textContent='Teresa Leading';ldr.className='vs-ldr t';document.getElementById('tWinBadge').style.display='inline';document.getElementById('oWinBadge').style.display='none';newLeader='teresa'}
+  else if(oS.value>tS.value){ldr.textContent='Omar Leading';ldr.className='vs-ldr o';document.getElementById('oWinBadge').style.display='inline';document.getElementById('tWinBadge').style.display='none';newLeader='omar'}
   else{ldr.textContent='Tied';ldr.className='vs-ldr tie';document.getElementById('tWinBadge').style.display='none';document.getElementById('oWinBadge').style.display='none'}
+
+  if(lastLeader&&lastLeader!==newLeader&&newLeader!=='tie'){
+    playLevelUp();
+    showNotif('LEAD CHANGE! '+(newLeader==='teresa'?'Teresa':'Omar')+' takes the lead!','win');
+  }
+  lastLeader=newLeader;
 
   const combined=tS.value+oS.value,cp=combined-500;
   document.getElementById('combined').textContent=fmt(combined);
   document.getElementById('combinedPnl').textContent=(cp>=0?'+':'')+fmt(Math.abs(cp))+' total';
-
   document.getElementById('sc1T').textContent=fmt(tS.value);document.getElementById('sc1O').textContent=fmt(oS.value);
   document.getElementById('sc2T').textContent=fmtPnl(tS.pnl);document.getElementById('sc2O').textContent=fmtPnl(oS.pnl);
   document.getElementById('sc3T').textContent=tS.trades;document.getElementById('sc3O').textContent=oS.trades;
 
   const m=Math.abs(tS.pnl-oS.pnl);
   let res,sub,sl;
-  if(m<0.50){res='DRAW';sub='Market was range-bound — no clear edge today';sl='Still anyone\'s fight'}
+  if(m<0.50){res='DRAW';sub='Market was range-bound, no clear edge today';sl='Still anyone\u0027s fight'}
   else if(tS.value>oS.value){res='TERESA LEADS';sub='Momentum ahead by $'+margin.toFixed(2);sl='Teresa'}
   else{res='OMAR LEADS';sub='Long Hold ahead by $'+margin.toFixed(2);sl='Omar'}
   document.getElementById('battleResult').textContent=res;
   document.getElementById('battleSub').textContent=sub;
   document.getElementById('scLdr').textContent=sl;
-
   document.getElementById('banterText').textContent=BANTERS[new Date().getDate()%BANTERS.length];
   document.getElementById('lastUpdate').textContent='Updated '+new Date().toLocaleTimeString();
 }
