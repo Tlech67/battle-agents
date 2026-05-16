@@ -340,6 +340,12 @@ async function loadSheet(){
       pnl:r.c[9]?parseFloat(r.c[9].v):0,trades:r.c[11]?parseInt(r.c[11].v):0,
       notes:r.c[12]?r.c[12].v:''
     }));
+    // Debug: log first row raw data to console
+    if(rows[0]&&rows[0].c[0]){
+      console.log('RAW time cell v:',JSON.stringify(rows[0].c[0].v));
+      console.log('RAW time cell f:',JSON.stringify(rows[0].c[0].f));
+      console.log('RAW agent cell:',JSON.stringify(rows[0].c[1]&&rows[0].c[1].v));
+    }
     const tT=trades.filter(t=>t.agent&&t.agent.toUpperCase()==='TERESA');
     const oT=trades.filter(t=>t.agent&&t.agent.toUpperCase()==='OMAR');
     return{trades,tT,oT,tLast:tT.length?tT[tT.length-1]:null,oLast:oT.length?oT[oT.length-1]:null};
