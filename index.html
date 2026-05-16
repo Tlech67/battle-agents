@@ -274,7 +274,7 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 
 <script>
 const SHEET_ID='1fFf7uBS1qbHg_pedn_tQzVUhrtpOimgdjj7hfWTTzZ4';
-const SHEET_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid=861227785';
+const SHEET_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Battle%20Scorecard';
 const COINS=[{coin:'BTC',pair:'XXBTZUSD'},{coin:'ETH',pair:'XETHZUSD'},{coin:'SOL',pair:'SOLUSD'},{coin:'AVAX',pair:'AVAXUSD'},{coin:'XRP',pair:'XXRPZUSD'}];
 const BANTERS=[
   "Teresa's momentum strategy entered confidently. The market handed her a dip. She took notes.",
@@ -329,34 +329,38 @@ async function loadSheet(){
   try{
     const r=await fetch(SHEET_URL);
     if(!r.ok){console.log('Sheet fetch failed:',r.status);return null}
-    const text=await r.text();
-    const lines=text.trim().split('\n');
-    if(lines.length<2){console.log('Sheet empty');return null}
-    // Skip header row, parse data rows
-    const trades=lines.slice(1).map(line=>{
-      // Handle CSV with quoted fields
-      const cols=[];
-      let cur='',inQ=false;
-      for(let i=0;i<line.length;i++){
-        const c=line[i];
-        if(c==='"'){inQ=!inQ}
-        else if(c===','&&!inQ){cols.push(cur.trim());cur=''}
-        else{cur+=c}
-      }
-      cols.push(cur.trim());
+    const t=await r.text();
+    const j=JSON.parse(t.substring(47).slice(0,-2));
+    const rows=j.table.rows;
+    if(!rows||!rows.length){console.log('Sheet empty');return null}
+
+    const trades=rows.map(function(r){
+      // Timestamp comes as "Date(2026,4,14,18,36,22)" string
+      var rawTime=r.c[0]?r.c[0].v:'';
+      var fmtTime=r.c[0]?r.c[0].f:'';
       return{
-        time:cols[0]||'',agent:(cols[1]||'').trim(),action:(cols[2]||'').trim(),
-        coin:(cols[3]||'').trim(),qty:parseFloat(cols[4])||0,
-        price:parseFloat(cols[5])||0,tradeVal:parseFloat(cols[6])||0,
-        cash:parseFloat(cols[7])||0,portVal:parseFloat(cols[8])||0,
-        pnl:parseFloat(cols[9])||0,trades:parseInt(cols[11])||0,
-        notes:(cols[12]||'').trim()
+        time:rawTime,
+        timeLabel:fmtTime||rawTime,
+        agent:r.c[1]?r.c[1].v:'',
+        action:r.c[2]?r.c[2].v:'',
+        coin:r.c[3]?r.c[3].v:'',
+        qty:r.c[4]?parseFloat(r.c[4].v):0,
+        price:r.c[5]?parseFloat(r.c[5].v):0,
+        tradeVal:r.c[6]?parseFloat(r.c[6].v):0,
+        cash:r.c[7]?parseFloat(r.c[7].v):0,
+        portVal:r.c[8]?parseFloat(r.c[8].v):0,
+        pnl:r.c[9]?parseFloat(r.c[9].v):0,
+        trades:r.c[11]?parseInt(r.c[11].v):0,
+        notes:r.c[12]?r.c[12].v:''
       };
-    }).filter(t=>t.agent&&t.action);
-    console.log('CSV trades loaded:',trades.length,'first:',trades[0]&&JSON.stringify(trades[0]));
-    const tT=trades.filter(t=>t.agent.toUpperCase()==='TERESA');
-    const oT=trades.filter(t=>t.agent.toUpperCase()==='OMAR');
-    return{trades,tT,oT,tLast:tT.length?tT[tT.length-1]:null,oLast:oT.length?oT[oT.length-1]:null};
+    }).filter(function(t){return t.agent&&t.action});
+
+    console.log('Trades loaded:',trades.length);
+    var tT=trades.filter(function(t){return t.agent==='TERESA'});
+    var oT=trades.filter(function(t){return t.agent==='OMAR'});
+    return{trades:trades,tT:tT,oT:oT,
+      tLast:tT.length?tT[tT.length-1]:null,
+      oLast:oT.length?oT[oT.length-1]:null};
   }catch(e){console.log('Sheet error:',e.message);return null}
 }
 
@@ -421,15 +425,23 @@ function renderTrades(trades){
   }).join('');
 }
 
+function parseGoogleDate(v){
+  if(!v)return null;
+  var m=v.toString().match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/);
+  if(m)return new Date(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]),parseInt(m[4]),parseInt(m[5]),parseInt(m[6]));
+  var d=new Date(v.toString().replace(' ','T'));
+  return isNaN(d.getTime())?null:d;
+}
+
 function renderChart(tT,oT){
   const canvas=document.getElementById('perfChart');
   if(!canvas)return;
   if(perfChart)perfChart.destroy();
   const allTimes=[...new Set([...tT.map(t=>t.time),...oT.map(t=>t.time)])].sort();
   const labels=['Start',...allTimes.map(t=>{
-    const d=parseTime(t);
-    if(!d)return'?';
-    return(d.getMonth()+1)+'/'+d.getDate()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const d=parseGoogleDate(t);
+    if(!d)return t;
+    return(d.getMonth()+1)+'/'+(d.getDate())+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   })];
   function series(trades){
     const v=[250];
