@@ -274,7 +274,7 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 
 <script>
 const SHEET_ID='1fFf7uBS1qbHg_pedn_tQzVUhrtpOimgdjj7hfWTTzZ4';
-const SHEET_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Battle%20Scorecard';
+const SHEET_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid=861227785';
 const COINS=[{coin:'BTC',pair:'XXBTZUSD'},{coin:'ETH',pair:'XETHZUSD'},{coin:'SOL',pair:'SOLUSD'},{coin:'AVAX',pair:'AVAXUSD'},{coin:'XRP',pair:'XXRPZUSD'}];
 const BANTERS=[
   "Teresa's momentum strategy entered confidently. The market handed her a dip. She took notes.",
@@ -328,28 +328,36 @@ function parseTime(t){
 async function loadSheet(){
   try{
     const r=await fetch(SHEET_URL);
-    const t=await r.text();
-    const j=JSON.parse(t.substring(47).slice(0,-2));
-    const rows=j.table.rows;
-    if(!rows||!rows.length)return null;
-    const trades=rows.map(r=>({
-      time:r.c[0]?(r.c[0].v||r.c[0].f||''):'',agent:r.c[1]?r.c[1].v:'',action:r.c[2]?r.c[2].v:'',
-      coin:r.c[3]?r.c[3].v:'',qty:r.c[4]?parseFloat(r.c[4].v):0,
-      price:r.c[5]?parseFloat(r.c[5].v):0,tradeVal:r.c[6]?parseFloat(r.c[6].v):0,
-      cash:r.c[7]?parseFloat(r.c[7].v):0,portVal:r.c[8]?parseFloat(r.c[8].v):0,
-      pnl:r.c[9]?parseFloat(r.c[9].v):0,trades:r.c[11]?parseInt(r.c[11].v):0,
-      notes:r.c[12]?r.c[12].v:''
-    }));
-    // Debug: log first row raw data to console
-    if(rows[0]&&rows[0].c[0]){
-      console.log('RAW time cell v:',JSON.stringify(rows[0].c[0].v));
-      console.log('RAW time cell f:',JSON.stringify(rows[0].c[0].f));
-      console.log('RAW agent cell:',JSON.stringify(rows[0].c[1]&&rows[0].c[1].v));
-    }
-    const tT=trades.filter(t=>t.agent&&t.agent.toUpperCase()==='TERESA');
-    const oT=trades.filter(t=>t.agent&&t.agent.toUpperCase()==='OMAR');
+    if(!r.ok){console.log('Sheet fetch failed:',r.status);return null}
+    const text=await r.text();
+    const lines=text.trim().split('\n');
+    if(lines.length<2){console.log('Sheet empty');return null}
+    // Skip header row, parse data rows
+    const trades=lines.slice(1).map(line=>{
+      // Handle CSV with quoted fields
+      const cols=[];
+      let cur='',inQ=false;
+      for(let i=0;i<line.length;i++){
+        const c=line[i];
+        if(c==='"'){inQ=!inQ}
+        else if(c===','&&!inQ){cols.push(cur.trim());cur=''}
+        else{cur+=c}
+      }
+      cols.push(cur.trim());
+      return{
+        time:cols[0]||'',agent:(cols[1]||'').trim(),action:(cols[2]||'').trim(),
+        coin:(cols[3]||'').trim(),qty:parseFloat(cols[4])||0,
+        price:parseFloat(cols[5])||0,tradeVal:parseFloat(cols[6])||0,
+        cash:parseFloat(cols[7])||0,portVal:parseFloat(cols[8])||0,
+        pnl:parseFloat(cols[9])||0,trades:parseInt(cols[11])||0,
+        notes:(cols[12]||'').trim()
+      };
+    }).filter(t=>t.agent&&t.action);
+    console.log('CSV trades loaded:',trades.length,'first:',trades[0]&&JSON.stringify(trades[0]));
+    const tT=trades.filter(t=>t.agent.toUpperCase()==='TERESA');
+    const oT=trades.filter(t=>t.agent.toUpperCase()==='OMAR');
     return{trades,tT,oT,tLast:tT.length?tT[tT.length-1]:null,oLast:oT.length?oT[oT.length-1]:null};
-  }catch(e){return null}
+  }catch(e){console.log('Sheet error:',e.message);return null}
 }
 
 async function loadPrices(){
