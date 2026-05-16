@@ -312,6 +312,15 @@ function fmtPct(n){n=parseFloat(n);return(n>=0?'+':'')+n.toFixed(2)+'%'}
 
 function parseTime(t){
   if(!t)return null;
+  // Handle Google Sheets Date() format: "Date(2026,4,14,18,36,21)"
+  const gMatch=t.toString().match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/);
+  if(gMatch){
+    return new Date(
+      parseInt(gMatch[1]),parseInt(gMatch[2]),parseInt(gMatch[3]),
+      parseInt(gMatch[4]),parseInt(gMatch[5]),parseInt(gMatch[6])
+    );
+  }
+  // Handle regular string format "2026-05-14 18:36:21"
   const d=new Date(t.toString().replace(' ','T'));
   return isNaN(d.getTime())?null:d;
 }
@@ -324,15 +333,15 @@ async function loadSheet(){
     const rows=j.table.rows;
     if(!rows||!rows.length)return null;
     const trades=rows.map(r=>({
-      time:r.c[0]?r.c[0].v:'',agent:r.c[1]?r.c[1].v:'',action:r.c[2]?r.c[2].v:'',
+      time:r.c[0]?(r.c[0].v||r.c[0].f||''):'',agent:r.c[1]?r.c[1].v:'',action:r.c[2]?r.c[2].v:'',
       coin:r.c[3]?r.c[3].v:'',qty:r.c[4]?parseFloat(r.c[4].v):0,
       price:r.c[5]?parseFloat(r.c[5].v):0,tradeVal:r.c[6]?parseFloat(r.c[6].v):0,
       cash:r.c[7]?parseFloat(r.c[7].v):0,portVal:r.c[8]?parseFloat(r.c[8].v):0,
       pnl:r.c[9]?parseFloat(r.c[9].v):0,trades:r.c[11]?parseInt(r.c[11].v):0,
       notes:r.c[12]?r.c[12].v:''
     }));
-    const tT=trades.filter(t=>t.agent==='TERESA');
-    const oT=trades.filter(t=>t.agent==='OMAR');
+    const tT=trades.filter(t=>t.agent&&t.agent.toUpperCase()==='TERESA');
+    const oT=trades.filter(t=>t.agent&&t.agent.toUpperCase()==='OMAR');
     return{trades,tT,oT,tLast:tT.length?tT[tT.length-1]:null,oLast:oT.length?oT[oT.length-1]:null};
   }catch(e){return null}
 }
