@@ -560,8 +560,11 @@ window.loadAll = function(){
       // Always calculate from live prices as fallback (Coinpaprika unreliable)
       var SUPPLIES={BTC:20030000,ETH:120270000,SOL:466000000,AVAX:406000000,XRP:57000000000,DOGE:145000000000,LINK:587000000,POL:9900000000,ADA:35600000000,DOT:1470000000};
       var totalMcap=0,btcMcap=0;
+      console.log('Prices keys:',Object.keys(prices));
       Object.keys(prices).forEach(function(c){var p=prices[c],s=SUPPLIES[c];if(p&&s){var m=p.price*s;totalMcap+=m;if(c==='BTC')btcMcap=m;}});
-      if(totalMcap>0){set('mcap','$'+(totalMcap/1e12).toFixed(2)+'T (est)');if(btcMcap>0)set('btcDom',(btcMcap/totalMcap*100).toFixed(1)+'%');}
+      console.log('totalMcap:',totalMcap,'btcMcap:',btcMcap);
+      if(totalMcap>0){set('mcap','$'+(totalMcap/1e12).toFixed(2)+'T');if(btcMcap>0)set('btcDom',(btcMcap/totalMcap*100).toFixed(1)+'%');}
+      else{set('mcap','Loading...');set('btcDom','Loading...');}
       renderPrices(prices);
 
       var tS={value:START_T,cash:START_T,pnl:0,pnlPct:0,trades:0,last:'Battle started May 17',holdings:{}};
