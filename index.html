@@ -456,6 +456,8 @@ function loadGlobalMetrics(){
     })
     .catch(function(e){console.log('CoinGecko global error:',e.message);return null});
 }
+
+function loadFG(){
   return fetch(PROXY+encodeURIComponent('https://api.alternative.me/fng/?limit=1'))
     .then(function(r){return r.json()})
     .then(function(d){return d.data&&d.data[0]?d.data[0]:null})
