@@ -73,6 +73,7 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .tbadge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;flex-shrink:0;margin-top:2px}
 .tbadge.buy{background:#1a2f1a;color:#3fb950;border:1px solid #238636}
 .tbadge.sell{background:#2a1a1a;color:#f85149;border:1px solid #6e2020}
+.tbadge.hold{background:#1a1a2a;color:#7d8590;border:1px solid #30363d}
 .t-main{color:#e6edf3}.t-note{font-size:10px;color:#7d8590;margin-top:2px}
 .t-who{font-size:10px;font-weight:600}
 .t-who.t{color:#f85149}.t-who.o{color:#388bfd}
@@ -202,14 +203,14 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
   </div>
   <div class="metric">
     <div class="m-label">Battle Fund</div>
-    <div class="m-value" id="combined">$500.00</div>
+    <div class="m-value" id="combined">$713.98</div>
     <div class="m-sub" id="combinedPnl">+$0.00 total</div>
   </div>
 </div>
 
 <div class="grid2">
   <div class="panel">
-    <div class="p-title">Live Prices &mdash; Battle Coins</div>
+    <div class="p-title">Live Prices &mdash; 10-Coin Battle Universe</div>
     <div id="priceList"><div class="empty">Loading prices...</div></div>
   </div>
   <div class="panel">
@@ -273,10 +274,28 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 </div>
 
 <script>
-const SHEET_ID='1fFf7uBS1qbHg_pedn_tQzVUhrtpOimgdjj7hfWTTzZ4';
-const SHEET_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Battle%20Scorecard';
-const COINS=[{coin:'BTC',pair:'XXBTZUSD'},{coin:'ETH',pair:'XETHZUSD'},{coin:'SOL',pair:'SOLUSD'},{coin:'AVAX',pair:'AVAXUSD'},{coin:'XRP',pair:'XXRPZUSD'}];
-const BANTERS=[
+// ── BATTLE CONFIG ─────────────────────────────────────────────
+const SHEET_ID   = '1fFf7uBS1qbHg_pedn_tQzVUhrtpOimgdjj7hfWTTzZ4';
+const SHEET_URL  = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Battle%20Scorecard';
+const START_T    = 356.99;  // Teresa's battle starting value (fair split May 17)
+const START_O    = 356.99;  // Omar's battle starting value (fair split May 17)
+const TOTAL_START = START_T + START_O; // 713.98
+
+// Full 10-coin universe with Kraken pairs
+const COINS = [
+  {coin:'BTC', pair:'XXBTZUSD'},
+  {coin:'ETH', pair:'XETHZUSD'},
+  {coin:'SOL', pair:'SOLUSD'},
+  {coin:'AVAX',pair:'AVAXUSD'},
+  {coin:'XRP', pair:'XXRPZUSD'},
+  {coin:'DOGE',pair:'XDGUSD'},
+  {coin:'LINK',pair:'LINKUSD'},
+  {coin:'POL', pair:'POLUSD'},
+  {coin:'ADA', pair:'ADAUSD'},
+  {coin:'DOT', pair:'DOTUSD'},
+];
+
+const BANTERS = [
   "Teresa's momentum strategy entered confidently. The market handed her a dip. She took notes.",
   "Omar's long hold strategy: buy, hold, ignore chaos, become accidentally wise.",
   "Momentum checked prices, saw sideways action, and immediately wrote a process improvement memo.",
@@ -284,7 +303,7 @@ const BANTERS=[
   "Teresa's agent is doing cardio. Omar's is doing tai chi. Both claim to be winning.",
   "The market was indecisive today... even the bots needed coffee.",
   "Momentum buys the rip. Long Hold buys the dip. The real winner is Coinbase fees.",
-  "Omar's strategy: buy ETH on weakness, hold forever, attend no meetings.",
+  "Omar's strategy: buy on weakness, hold forever, attend no meetings.",
   "Teresa cut a loser at 7% and immediately found a better opportunity to lose money faster.",
   "Long Hold conviction: immovable. Teresa conviction: recalibrating every 4 hours.",
   "BTC didn't move much today. Omar called it a win. Teresa called it an insult.",
@@ -293,77 +312,67 @@ const BANTERS=[
   "Momentum entered with a battle cry. Long Hold entered with a spreadsheet from 2019.",
 ];
 
-let perfChart=null,livePrices={},soundOn=true,lastTradeCount=0,lastLeader='',audioCtx=null;
+let perfChart=null, livePrices={}, soundOn=true, lastTradeCount=0, lastLeader='', audioCtx=null;
 
+// ── AUDIO ─────────────────────────────────────────────────────
 function getAC(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
 function tone(f,d,t,v){try{const c=getAC(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=t||'square';o.frequency.value=f;g.gain.setValueAtTime(v||0.12,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);o.start();o.stop(c.currentTime+d)}catch(e){}}
 function playBuy(){if(!soundOn)return;tone(523,0.1);setTimeout(()=>tone(659,0.1),100);setTimeout(()=>tone(784,0.15),200)}
 function playSell(){if(!soundOn)return;tone(784,0.1);setTimeout(()=>tone(659,0.1),100);setTimeout(()=>tone(523,0.15),200)}
 function playLevelUp(){if(!soundOn)return;[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.12),i*120))}
 function playClick(){if(!soundOn)return;tone(440,0.05,'sine',0.07)}
-
 function toggleSound(){soundOn=!soundOn;const b=document.getElementById('soundBtn');b.innerHTML=soundOn?'&#128266;':'&#128263;';b.className=soundOn?'sound-btn on':'sound-btn'}
 
+// ── NOTIFICATIONS ─────────────────────────────────────────────
 function showNotif(msg,type){const el=document.getElementById('notif');el.textContent=msg;el.className='notif show '+(type||'');clearTimeout(el._t);el._t=setTimeout(()=>el.className='notif',3500)}
 
+// ── FORMATTERS ────────────────────────────────────────────────
 function fmt(n){return'$'+parseFloat(n).toFixed(2)}
 function fmtPnl(n){n=parseFloat(n);return(n>=0?'+':'')+fmt(Math.abs(n))}
 function fmtPct(n){n=parseFloat(n);return(n>=0?'+':'')+n.toFixed(2)+'%'}
 
-function parseTime(t){
-  if(!t)return null;
-  // Handle Google Sheets Date() format: "Date(2026,4,14,18,36,21)"
-  const gMatch=t.toString().match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/);
-  if(gMatch){
-    return new Date(
-      parseInt(gMatch[1]),parseInt(gMatch[2]),parseInt(gMatch[3]),
-      parseInt(gMatch[4]),parseInt(gMatch[5]),parseInt(gMatch[6])
-    );
-  }
-  // Handle regular string format "2026-05-14 18:36:21"
-  const d=new Date(t.toString().replace(' ','T'));
+// ── DATE PARSER ───────────────────────────────────────────────
+function parseGDate(v){
+  if(!v)return null;
+  var m=v.toString().match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/);
+  if(m)return new Date(+m[1],+m[2],+m[3],+m[4],+m[5],+m[6]);
+  var d=new Date(v.toString().replace(' ','T'));
   return isNaN(d.getTime())?null:d;
 }
 
+// ── SHEET LOADER ──────────────────────────────────────────────
 async function loadSheet(){
   try{
     const r=await fetch(SHEET_URL);
-    if(!r.ok){console.log('Sheet fetch failed:',r.status);return null}
+    if(!r.ok)return null;
     const t=await r.text();
     const j=JSON.parse(t.substring(47).slice(0,-2));
     const rows=j.table.rows;
-    if(!rows||!rows.length){console.log('Sheet empty');return null}
+    if(!rows||!rows.length)return null;
 
-    const trades=rows.map(function(r){
-      // Timestamp comes as "Date(2026,4,14,18,36,22)" string
-      var rawTime=r.c[0]?r.c[0].v:'';
-      var fmtTime=r.c[0]?r.c[0].f:'';
-      return{
-        time:rawTime,
-        timeLabel:fmtTime||rawTime,
-        agent:r.c[1]?r.c[1].v:'',
-        action:r.c[2]?r.c[2].v:'',
-        coin:r.c[3]?r.c[3].v:'',
-        qty:r.c[4]?parseFloat(r.c[4].v):0,
-        price:r.c[5]?parseFloat(r.c[5].v):0,
-        tradeVal:r.c[6]?parseFloat(r.c[6].v):0,
-        cash:r.c[7]?parseFloat(r.c[7].v):0,
-        portVal:r.c[8]?parseFloat(r.c[8].v):0,
-        pnl:r.c[9]?parseFloat(r.c[9].v):0,
-        trades:r.c[11]?parseInt(r.c[11].v):0,
-        notes:r.c[12]?r.c[12].v:''
-      };
-    }).filter(function(t){return t.agent&&t.action});
+    const trades=rows.map(r=>({
+      time:   r.c[0]?r.c[0].v:'',
+      timeFmt:r.c[0]?r.c[0].f:'',
+      agent:  r.c[1]?r.c[1].v:'',
+      action: r.c[2]?r.c[2].v:'',
+      coin:   r.c[3]?r.c[3].v:'',
+      qty:    r.c[4]?parseFloat(r.c[4].v):0,
+      price:  r.c[5]?parseFloat(r.c[5].v):0,
+      tradeVal:r.c[6]?parseFloat(r.c[6].v):0,
+      cash:   r.c[7]?parseFloat(r.c[7].v):0,
+      portVal:r.c[8]?parseFloat(r.c[8].v):0,
+      pnl:    r.c[9]?parseFloat(r.c[9].v):0,
+      trades: r.c[11]?parseInt(r.c[11].v):0,
+      notes:  r.c[12]?r.c[12].v:'',
+    })).filter(t=>t.agent&&t.action);
 
-    console.log('Trades loaded:',trades.length);
-    var tT=trades.filter(function(t){return t.agent==='TERESA'});
-    var oT=trades.filter(function(t){return t.agent==='OMAR'});
-    return{trades:trades,tT:tT,oT:oT,
-      tLast:tT.length?tT[tT.length-1]:null,
-      oLast:oT.length?oT[oT.length-1]:null};
+    const tT=trades.filter(t=>t.agent==='TERESA');
+    const oT=trades.filter(t=>t.agent==='OMAR');
+    return{trades,tT,oT,tLast:tT.length?tT[tT.length-1]:null,oLast:oT.length?oT[oT.length-1]:null};
   }catch(e){console.log('Sheet error:',e.message);return null}
 }
 
+// ── PRICES ────────────────────────────────────────────────────
 async function loadPrices(){
   const res={};
   for(const{coin,pair}of COINS){
@@ -383,15 +392,32 @@ async function loadPrices(){
 async function loadFG(){try{const r=await fetch('https://api.alternative.me/fng/?limit=1');const d=await r.json();return d.data&&d.data[0]?d.data[0]:null}catch(e){return null}}
 async function loadPaprika(){try{const r=await fetch('https://api.coinpaprika.com/v1/global');if(!r.ok)return null;return await r.json()}catch(e){return null}}
 
+// ── BUILD HOLDINGS from trade history ────────────────────────
+// Handles BUY, SELL, and HOLD (seed rows) actions
 function buildHoldings(trades){
   const h={};
   trades.forEach(t=>{
-    if(t.action==='BUY'){if(!h[t.coin])h[t.coin]={qty:0,avgPrice:0,totalCost:0};h[t.coin].totalCost+=t.tradeVal;h[t.coin].qty+=t.qty;h[t.coin].avgPrice=h[t.coin].totalCost/h[t.coin].qty}
-    else if(t.action==='SELL'){delete h[t.coin]}
+    if(t.action==='BUY'||t.action==='HOLD'){
+      // HOLD rows = initial seeded positions (qty and price from sheet)
+      if(!h[t.coin])h[t.coin]={qty:0,avgPrice:0,totalCost:0};
+      if(t.action==='HOLD'&&h[t.coin].qty===0){
+        // Seed the initial position directly
+        h[t.coin].qty=t.qty;
+        h[t.coin].avgPrice=t.price;
+        h[t.coin].totalCost=t.qty*t.price;
+      } else if(t.action==='BUY'){
+        h[t.coin].totalCost+=t.tradeVal;
+        h[t.coin].qty+=t.qty;
+        h[t.coin].avgPrice=h[t.coin].qty>0?h[t.coin].totalCost/h[t.coin].qty:t.price;
+      }
+    } else if(t.action==='SELL'){
+      delete h[t.coin];
+    }
   });
   return h;
 }
 
+// ── RENDER HOLDINGS ───────────────────────────────────────────
 function renderHoldings(id,h,p){
   const el=document.getElementById(id);
   const coins=Object.keys(h);
@@ -400,10 +426,12 @@ function renderHoldings(id,h,p){
     const hh=h[c],pp=p[c];
     const val=pp?hh.qty*pp.price:hh.qty*hh.avgPrice;
     const pnl=val-hh.totalCost,pct=hh.totalCost>0?(pnl/hh.totalCost*100):0;
-    return'<div class="h-row"><div><div class="h-coin">'+c+'</div><div class="h-det">'+hh.qty.toFixed(6)+' @ '+fmt(hh.avgPrice)+'</div></div><div><div class="h-val">'+fmt(val)+'</div><div class="h-pnl '+(pnl>=0?'up':'dn')+'">'+fmtPnl(pnl)+' ('+fmtPct(pct)+')</div></div></div>';
+    const pStr=hh.avgPrice>100?fmt(hh.avgPrice):'$'+hh.avgPrice.toFixed(4);
+    return'<div class="h-row"><div><div class="h-coin">'+c+'</div><div class="h-det">'+hh.qty.toFixed(6)+' @ '+pStr+'</div></div><div><div class="h-val">'+fmt(val)+'</div><div class="h-pnl '+(pnl>=0?'up':'dn')+'">'+fmtPnl(pnl)+' ('+fmtPct(pct)+')</div></div></div>';
   }).join('');
 }
 
+// ── RENDER PRICES ─────────────────────────────────────────────
 function renderPrices(p){
   const el=document.getElementById('priceList');
   const coins=Object.keys(p);
@@ -415,47 +443,46 @@ function renderPrices(p){
   }).join('');
 }
 
+// ── RENDER TRADES ─────────────────────────────────────────────
 function renderTrades(trades){
   const el=document.getElementById('tradeList');
-  const recent=[...trades].reverse().slice(0,6);
-  if(!recent.length){el.innerHTML='<div class="empty">No trades yet</div>';return}
-  el.innerHTML=recent.map(t=>{
+  // Filter out HOLD seed rows from recent trades display
+  const real=[...trades].filter(t=>t.action!=='HOLD').reverse().slice(0,6);
+  const all=[...trades].reverse().slice(0,6);
+  const show=real.length?real:all; // fallback to all if no real trades yet
+  if(!show.length){el.innerHTML='<div class="empty">No trades yet</div>';return}
+  el.innerHTML=show.map(t=>{
     const ac=t.action.toLowerCase(),wc=t.agent==='TERESA'?'t':'o';
     return'<div class="trade-row"><span class="tbadge '+ac+'">'+t.action+'</span><div><div class="t-main"><span class="t-who '+wc+'">'+t.agent+'</span> &mdash; '+t.coin+' @ '+fmt(t.price)+'</div><div class="t-note">'+t.notes+'</div></div></div>';
   }).join('');
 }
 
-function parseGoogleDate(v){
-  if(!v)return null;
-  var m=v.toString().match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/);
-  if(m)return new Date(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]),parseInt(m[4]),parseInt(m[5]),parseInt(m[6]));
-  var d=new Date(v.toString().replace(' ','T'));
-  return isNaN(d.getTime())?null:d;
-}
-
+// ── RENDER CHART ──────────────────────────────────────────────
 function renderChart(tT,oT){
   const canvas=document.getElementById('perfChart');
   if(!canvas)return;
   if(perfChart)perfChart.destroy();
   const allTimes=[...new Set([...tT.map(t=>t.time),...oT.map(t=>t.time)])].sort();
   const labels=['Start',...allTimes.map(t=>{
-    const d=parseGoogleDate(t);
+    const d=parseGDate(t);
     if(!d)return t;
     return(d.getMonth()+1)+'/'+(d.getDate())+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   })];
-  function series(trades){
-    const v=[250];
+
+  function series(trades,start){
+    const v=[start];
     allTimes.forEach(time=>{
       const match=trades.filter(t=>t.time===time);
       v.push(match.length?match[match.length-1].portVal:v[v.length-1]);
     });
     return v;
   }
+
   perfChart=new Chart(canvas,{
     type:'line',
     data:{labels,datasets:[
-      {label:'Teresa',data:series(tT),borderColor:'#f85149',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
-      {label:'Omar',data:series(oT),borderColor:'#388bfd',borderWidth:2,pointRadius:3,tension:0.3,fill:false,borderDash:[5,3]}
+      {label:'Teresa',data:series(tT,START_T),borderColor:'#f85149',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
+      {label:'Omar',  data:series(oT,START_O),borderColor:'#388bfd',borderWidth:2,pointRadius:3,tension:0.3,fill:false,borderDash:[5,3]}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toFixed(2)}}},
@@ -467,12 +494,15 @@ function renderChart(tT,oT){
   });
 }
 
+// ── MAIN LOAD ─────────────────────────────────────────────────
 async function loadAll(){
   document.getElementById('lastUpdate').textContent='Refreshing...';
   playClick();
+
   const[sheet,prices,fg,paprika]=await Promise.all([loadSheet(),loadPrices(),loadFG(),loadPaprika()]);
   livePrices=prices;
 
+  // Fear & Greed
   if(fg){
     const v=parseInt(fg.value);
     document.getElementById('fgVal').textContent=v+'/100';
@@ -484,43 +514,68 @@ async function loadAll(){
     ll.textContent=v<30?'High':v<50?'Medium':'Low';
     ll.className='thr-lvl '+(v<30?'high':v<50?'medium':'low');
   }
+
+  // Market metrics
   if(paprika){
     if(paprika.bitcoin_dominance_percentage)document.getElementById('btcDom').textContent=paprika.bitcoin_dominance_percentage.toFixed(1)+'%';
     if(paprika.market_cap_usd)document.getElementById('mcap').textContent='$'+(paprika.market_cap_usd/1e12).toFixed(2)+'T';
   }
+
   renderPrices(prices);
 
-  let tS={value:250,cash:250,pnl:0,pnlPct:0,trades:0,last:'No trades yet',holdings:{}};
-  let oS={value:250,cash:250,pnl:0,pnlPct:0,trades:0,last:'No trades yet',holdings:{}};
+  // Default states — start at fair split values
+  let tS={value:START_T,cash:START_T,pnl:0,pnlPct:0,trades:0,last:'Battle started May 17',holdings:{}};
+  let oS={value:START_O,cash:START_O,pnl:0,pnlPct:0,trades:0,last:'Battle started May 17',holdings:{}};
 
   if(sheet){
     const{trades,tT,oT,tLast,oLast}=sheet;
-    const newCount=trades.length;
+
+    // Sound alerts for new trades
+    const newCount=trades.filter(t=>t.action!=='HOLD').length;
     if(lastTradeCount>0&&newCount>lastTradeCount){
-      const newest=trades[trades.length-1];
-      if(newest.action==='BUY'){playBuy();showNotif('BUY '+newest.agent+' '+newest.coin+' @ '+fmt(newest.price),'buy')}
-      else{playSell();showNotif('SELL '+newest.agent+' '+newest.coin+' @ '+fmt(newest.price),'sell')}
+      const newest=[...trades].filter(t=>t.action!=='HOLD').pop();
+      if(newest){
+        if(newest.action==='BUY'){playBuy();showNotif('BUY '+newest.agent+' '+newest.coin+' @ '+fmt(newest.price),'buy')}
+        else{playSell();showNotif('SELL '+newest.agent+' '+newest.coin+' @ '+fmt(newest.price),'sell')}
+      }
     }
     lastTradeCount=newCount;
 
+    // Teresa stats
     if(tLast){
-      tS.cash=tLast.cash;tS.trades=tLast.trades;
+      tS.cash=tLast.cash;
+      tS.trades=tLast.trades;
       tS.last='Last: '+tLast.action+' '+tLast.coin+' @ '+fmt(tLast.price);
       tS.holdings=buildHoldings(tT);
-      const hv=Object.entries(tS.holdings).reduce((s,[c,h])=>{const p=prices[c];return s+(p?h.qty*p.price:h.qty*h.avgPrice)},0);
-      tS.value=tLast.cash+hv;tS.pnl=tS.value-250;tS.pnlPct=tS.pnl/250*100;
+      const hv=Object.entries(tS.holdings).reduce((s,[c,h])=>{
+        const p=prices[c];return s+(p?h.qty*p.price:h.qty*h.avgPrice);
+      },0);
+      tS.value=tLast.cash+hv;
+      tS.pnl=tS.value-START_T;
+      tS.pnlPct=tS.pnl/START_T*100;
     }
+
+    // Omar stats
     if(oLast){
-      oS.cash=oLast.cash;oS.trades=oLast.trades;
+      oS.cash=oLast.cash;
+      oS.trades=oLast.trades;
       oS.last='Last: '+oLast.action+' '+oLast.coin+' @ '+fmt(oLast.price);
       oS.holdings=buildHoldings(oT);
-      const hv=Object.entries(oS.holdings).reduce((s,[c,h])=>{const p=prices[c];return s+(p?h.qty*p.price:h.qty*h.avgPrice)},0);
-      oS.value=oLast.cash+hv;oS.pnl=oS.value-250;oS.pnlPct=oS.pnl/250*100;
+      const hv=Object.entries(oS.holdings).reduce((s,[c,h])=>{
+        const p=prices[c];return s+(p?h.qty*p.price:h.qty*h.avgPrice);
+      },0);
+      oS.value=oLast.cash+hv;
+      oS.pnl=oS.value-START_O;
+      oS.pnlPct=oS.pnl/START_O*100;
     }
+
     renderTrades(trades);
     renderChart(tT,oT);
-  }else{renderChart([],[])}
+  }else{
+    renderChart([],[]);
+  }
 
+  // Update fighter cards
   ['t','o'].forEach(k=>{
     const s=k==='t'?tS:oS;
     document.getElementById(k+'Val').textContent=fmt(s.value);
@@ -535,13 +590,26 @@ async function loadAll(){
   renderHoldings('tHoldings',tS.holdings,prices);
   renderHoldings('oHoldings',oS.holdings,prices);
 
+  // VS panel
   const margin=Math.abs(tS.value-oS.value);
   document.getElementById('vsGap').textContent=margin<0.01?'Dead even':'$'+margin.toFixed(2)+' gap';
   const ldr=document.getElementById('vsLdr');
   let newLeader='tie';
-  if(tS.value>oS.value){ldr.textContent='Teresa Leading';ldr.className='vs-ldr t';document.getElementById('tWinBadge').style.display='inline';document.getElementById('oWinBadge').style.display='none';newLeader='teresa'}
-  else if(oS.value>tS.value){ldr.textContent='Omar Leading';ldr.className='vs-ldr o';document.getElementById('oWinBadge').style.display='inline';document.getElementById('tWinBadge').style.display='none';newLeader='omar'}
-  else{ldr.textContent='Tied';ldr.className='vs-ldr tie';document.getElementById('tWinBadge').style.display='none';document.getElementById('oWinBadge').style.display='none'}
+  if(tS.value>oS.value){
+    ldr.textContent='Teresa Leading';ldr.className='vs-ldr t';
+    document.getElementById('tWinBadge').style.display='inline';
+    document.getElementById('oWinBadge').style.display='none';
+    newLeader='teresa';
+  }else if(oS.value>tS.value){
+    ldr.textContent='Omar Leading';ldr.className='vs-ldr o';
+    document.getElementById('oWinBadge').style.display='inline';
+    document.getElementById('tWinBadge').style.display='none';
+    newLeader='omar';
+  }else{
+    ldr.textContent='Tied';ldr.className='vs-ldr tie';
+    document.getElementById('tWinBadge').style.display='none';
+    document.getElementById('oWinBadge').style.display='none';
+  }
 
   if(lastLeader&&lastLeader!==newLeader&&newLeader!=='tie'){
     playLevelUp();
@@ -549,21 +617,28 @@ async function loadAll(){
   }
   lastLeader=newLeader;
 
-  const combined=tS.value+oS.value,cp=combined-500;
+  // Combined fund
+  const combined=tS.value+oS.value,cp=combined-TOTAL_START;
   document.getElementById('combined').textContent=fmt(combined);
   document.getElementById('combinedPnl').textContent=(cp>=0?'+':'')+fmt(Math.abs(cp))+' total';
-  document.getElementById('sc1T').textContent=fmt(tS.value);document.getElementById('sc1O').textContent=fmt(oS.value);
-  document.getElementById('sc2T').textContent=fmtPnl(tS.pnl);document.getElementById('sc2O').textContent=fmtPnl(oS.pnl);
-  document.getElementById('sc3T').textContent=tS.trades;document.getElementById('sc3O').textContent=oS.trades;
+
+  // Score table
+  document.getElementById('sc1T').textContent=fmt(tS.value);
+  document.getElementById('sc1O').textContent=fmt(oS.value);
+  document.getElementById('sc2T').textContent=fmtPnl(tS.pnl);
+  document.getElementById('sc2O').textContent=fmtPnl(oS.pnl);
+  document.getElementById('sc3T').textContent=tS.trades;
+  document.getElementById('sc3O').textContent=oS.trades;
 
   const m=Math.abs(tS.pnl-oS.pnl);
   let res,sub,sl;
-  if(m<0.50){res='DRAW';sub='Market was range-bound, no clear edge today';sl='Still anyone\u0027s fight'}
+  if(m<0.50){res='DRAW';sub='Market was range-bound, no clear edge today';sl='Still anyone\'s fight'}
   else if(tS.value>oS.value){res='TERESA LEADS';sub='Momentum ahead by $'+margin.toFixed(2);sl='Teresa'}
   else{res='OMAR LEADS';sub='Long Hold ahead by $'+margin.toFixed(2);sl='Omar'}
   document.getElementById('battleResult').textContent=res;
   document.getElementById('battleSub').textContent=sub;
   document.getElementById('scLdr').textContent=sl;
+
   document.getElementById('banterText').textContent=BANTERS[new Date().getDate()%BANTERS.length];
   document.getElementById('lastUpdate').textContent='Updated '+new Date().toLocaleTimeString();
 }
