@@ -439,7 +439,23 @@ function loadPrices(){
     });
 }
 
-function loadFG(){
+function loadGlobalMetrics(){
+  // CoinGecko /global — real BTC dominance and total market cap, all coins
+  return fetch(PROXY+encodeURIComponent('https://api.coingecko.com/api/v3/global'))
+    .then(function(r){return r.json()})
+    .then(function(d){
+      if(!d||!d.data)return null;
+      var dom=d.data.market_cap_percentage&&d.data.market_cap_percentage.btc;
+      var mcap=d.data.total_market_cap&&d.data.total_market_cap.usd;
+      if(!dom||!mcap)return null;
+      dom=parseFloat(dom);
+      // Validate realistic range
+      if(dom>70){console.warn('BTC dominance flagged as suspect: '+dom.toFixed(1)+'% — possible API error');return null;}
+      if(dom<35){console.warn('BTC dominance unusually low: '+dom.toFixed(1)+'%');return null;}
+      return{btcDom:dom.toFixed(1)+'%',totalMcap:'$'+(mcap/1e12).toFixed(2)+'T'};
+    })
+    .catch(function(e){console.log('CoinGecko global error:',e.message);return null});
+}
   return fetch(PROXY+encodeURIComponent('https://api.alternative.me/fng/?limit=1'))
     .then(function(r){return r.json()})
     .then(function(d){return d.data&&d.data[0]?d.data[0]:null})
@@ -538,9 +554,9 @@ function set(id,val){var el=document.getElementById(id);if(el)el.textContent=val
 window.loadAll = function(){
   set('lastUpdate','Refreshing...');
   playClick();
-  Promise.all([loadSheet(),loadPrices(),loadFG(),loadPaprika()])
+  Promise.all([loadSheet(),loadPrices(),loadFG(),loadPaprika(),loadGlobalMetrics()])
     .then(function(res){
-      var sheet=res[0],prices=res[1],fg=res[2],paprika=res[3];
+      var sheet=res[0],prices=res[1],fg=res[2],paprika=res[3],global=res[4];
       livePrices=prices;
 
       if(fg){
@@ -553,18 +569,16 @@ window.loadAll = function(){
         ll.textContent=v<30?'High':v<50?'Medium':'Low';
         ll.className='thr-lvl '+(v<30?'high':v<50?'medium':'low');
       }
-      if(paprika){
-        if(paprika.bitcoin_dominance_percentage)set('btcDom',paprika.bitcoin_dominance_percentage.toFixed(1)+'%');
-        if(paprika.market_cap_usd)set('mcap','$'+(paprika.market_cap_usd/1e12).toFixed(2)+'T');
+
+      // BTC Dominance + Market Cap from CoinGecko global (validated)
+      if(global){
+        set('btcDom',global.btcDom);
+        set('mcap',global.totalMcap);
+      } else {
+        set('btcDom','N/A');
+        set('mcap','N/A');
       }
-      // Always calculate from live prices as fallback (Coinpaprika unreliable)
-      var SUPPLIES={BTC:20030000,ETH:120270000,SOL:466000000,AVAX:406000000,XRP:57000000000,DOGE:145000000000,LINK:587000000,POL:9900000000,ADA:35600000000,DOT:1470000000};
-      var totalMcap=0,btcMcap=0;
-      console.log('Prices keys:',Object.keys(prices));
-      Object.keys(prices).forEach(function(c){var p=prices[c],s=SUPPLIES[c];if(p&&s){var m=p.price*s;totalMcap+=m;if(c==='BTC')btcMcap=m;}});
-      console.log('totalMcap:',totalMcap,'btcMcap:',btcMcap);
-      if(totalMcap>0){set('mcap','$'+(totalMcap/1e12).toFixed(2)+'T');if(btcMcap>0)set('btcDom',(btcMcap/totalMcap*100).toFixed(1)+'%');}
-      else{set('mcap','Loading...');set('btcDom','Loading...');}
+
       renderPrices(prices);
 
       var tS={value:START_T,cash:START_T,pnl:0,pnlPct:0,trades:0,last:'Battle started May 17',holdings:{}};
