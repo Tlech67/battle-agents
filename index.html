@@ -302,7 +302,8 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 // ── CONFIG ────────────────────────────────────────────────────
 var SHEET_ID     = '1fFf7uBS1qbHg_pedn_tQzVUhrtpOimgdjj7hfWTTzZ4';
 var SHEET_URL    = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Battle%20Scorecard';
-var PROXY        = 'https://corsproxy.io/?url=';
+var PROXY        = 'https://api.allorigins.win/raw?url=';
+var PROXY2       = 'https://corsproxy.io/?url=';
 var START_T      = 356.99;
 var START_O      = 356.99;
 var TOTAL_START  = 713.98;
@@ -408,8 +409,10 @@ function loadSheet(){
 }
 
 function loadOneCoin(coin,pair){
-  return fetch(PROXY+encodeURIComponent('https://api.kraken.com/0/public/Ticker?pair='+pair))
-    .then(function(r){return r.json()})
+  var url='https://api.kraken.com/0/public/Ticker?pair='+pair;
+  return fetch(PROXY+encodeURIComponent(url))
+    .then(function(r){if(!r.ok)throw new Error('bad status');return r.json()})
+    .catch(function(){return fetch(PROXY2+encodeURIComponent(url)).then(function(r){return r.json()})})
     .then(function(d){
       if(d.error&&d.error.length)return null;
       var info=d.result&&d.result[pair];
@@ -429,24 +432,25 @@ function loadPrices(){
 }
 
 function loadFG(){
-  return fetch(PROXY+encodeURIComponent('https://api.alternative.me/fng/?limit=1'))
+  var url='https://api.alternative.me/fng/?limit=1';
+  return fetch(PROXY+encodeURIComponent(url))
     .then(function(r){return r.json()})
+    .catch(function(){return fetch(PROXY2+encodeURIComponent(url)).then(function(r){return r.json()})})
     .then(function(d){return d.data&&d.data[0]?d.data[0]:null})
     .catch(function(){return null});
 }
 
 function loadGlobal(){
-  // CoinGecko global — real BTC dominance across ALL cryptocurrencies
-  return fetch(PROXY+encodeURIComponent('https://api.coingecko.com/api/v3/global'))
+  var url='https://api.coingecko.com/api/v3/global';
+  return fetch(PROXY+encodeURIComponent(url))
     .then(function(r){return r.json()})
+    .catch(function(){return fetch(PROXY2+encodeURIComponent(url)).then(function(r){return r.json()})})
     .then(function(d){
       if(!d||!d.data)return null;
       var dom=parseFloat(d.data.market_cap_percentage&&d.data.market_cap_percentage.btc);
       var mcap=d.data.total_market_cap&&d.data.total_market_cap.usd;
       if(!dom||!mcap)return null;
-      // Validate realistic range 35-65%; flag if outside
-      if(dom>70){console.warn('BTC dominance suspect: '+dom.toFixed(1)+'%');return null;}
-      if(dom<35){console.warn('BTC dominance low: '+dom.toFixed(1)+'%');return null;}
+      if(dom>70||dom<35){console.warn('BTC dominance out of range: '+dom.toFixed(1)+'%');return null;}
       return{btcDom:dom.toFixed(1)+'%',totalMcap:'$'+(mcap/1e12).toFixed(2)+'T'};
     }).catch(function(e){console.log('CoinGecko error:',e.message);return null});
 }
