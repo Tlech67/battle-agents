@@ -444,24 +444,26 @@ async function loadSheet(){
 }
 
 // ── PRICES ────────────────────────────────────────────────────
+const CORS = 'https://corsproxy.io/?';
+
 async function loadPrices(){
   const res={};
   for(const{coin,pair}of COINS){
     try{
-      const r=await fetch('https://api.kraken.com/0/public/Ticker?pair='+pair);
+      const r=await fetch(CORS+'https://api.kraken.com/0/public/Ticker?pair='+pair);
       const d=await r.json();
       if(d.error&&d.error.length)continue;
       const info=d.result&&d.result[pair];
       if(!info)continue;
       const price=parseFloat(info.c[0]),open=parseFloat(info.o);
       res[coin]={price,change:open>0?((price-open)/open*100):0};
-    }catch(e){}
+    }catch(e){console.log('Price error '+coin+':',e.message)}
   }
   return res;
 }
 
-async function loadFG(){try{const r=await fetch('https://api.alternative.me/fng/?limit=1');const d=await r.json();return d.data&&d.data[0]?d.data[0]:null}catch(e){return null}}
-async function loadPaprika(){try{const r=await fetch('https://api.coinpaprika.com/v1/global');if(!r.ok)return null;return await r.json()}catch(e){return null}}
+async function loadFG(){try{const r=await fetch(CORS+'https://api.alternative.me/fng/?limit=1');const d=await r.json();return d.data&&d.data[0]?d.data[0]:null}catch(e){return null}}
+async function loadPaprika(){try{const r=await fetch(CORS+'https://api.coinpaprika.com/v1/global');if(!r.ok)return null;return await r.json()}catch(e){return null}}
 
 // ── BUILD HOLDINGS from trade history ────────────────────────
 // Handles BUY, SELL, and HOLD (seed rows) actions
