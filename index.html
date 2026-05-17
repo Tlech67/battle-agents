@@ -340,11 +340,13 @@ function updateCountdown(){
   document.getElementById('cdMins').textContent  = String(mins).padStart(2,'0');
   document.getElementById('cdSecs').textContent  = String(secs).padStart(2,'0');
   document.getElementById('cdProgressFill').style.width = pct + '%';
-  document.getElementById('cdPct').textContent   = pct + '% complete &mdash; ' + days + ' days remaining';
+  document.getElementById('cdPct').textContent   = pct + '% complete — ' + days + ' days remaining';
 }
 
 updateCountdown();
 setInterval(updateCountdown, 1000);
+
+const SHEET_ID   = '1fFf7uBS1qbHg_pedn_tQzVUhrtpOimgdjj7hfWTTzZ4';
 const SHEET_URL  = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Battle%20Scorecard';
 const START_T    = 356.99;  // Teresa's battle starting value (fair split May 17)
 const START_O    = 356.99;  // Omar's battle starting value (fair split May 17)
