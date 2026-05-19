@@ -165,7 +165,10 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;overflow:hidden;margin-bottom:16px;position:relative;">
   <div style="position:absolute;left:0;top:0;bottom:0;width:48px;background:linear-gradient(90deg,#161b22,transparent);z-index:2;pointer-events:none;"></div>
   <div style="position:absolute;right:0;top:0;bottom:0;width:48px;background:linear-gradient(270deg,#161b22,transparent);z-index:2;pointer-events:none;"></div>
-  <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f0883e;z-index:3;">Stocks</div>
+  <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7d8590;z-index:3;display:flex;flex-direction:column;gap:2px;line-height:1.2;">
+    <span style="color:#f0883e;">&#9679; Crypto</span>
+    <span style="color:#388bfd;">&#9632; Stock</span>
+  </div>
   <div style="overflow:hidden;white-space:nowrap;">
     <div id="tickerTrack" style="display:inline-flex;animation:tickerScroll 30s linear infinite;padding:10px 0;" onmouseover="this.style.animationPlayState='paused'" onmouseout="this.style.animationPlayState='running'">
       <div id="tickerInner" style="display:inline-flex;"></div>
@@ -596,16 +599,45 @@ function renderChart(tT,oT){
 }
 
 // ── MAIN ──────────────────────────────────────────────────────
-var STOCKS=[
-  {sym:'COIN',name:'Coinbase'},{sym:'MSTR',name:'MicroStrategy'},
-  {sym:'MARA',name:'Marathon'},{sym:'NVDA',name:'Nvidia'},
-  {sym:'TSLA',name:'Tesla'},{sym:'HOOD',name:'Robinhood'},
-  {sym:'PLTR',name:'Palantir'},{sym:'SQ',name:'Block'}
+// ── CRYPTO TICKER PAIRS (Kraken) ─────────────────────────────
+var TICKER_CRYPTO=[
+  {sym:'BTC',pair:'XXBTZUSD'},{sym:'ETH',pair:'XETHZUSD'},
+  {sym:'SOL',pair:'SOLUSD'},{sym:'DOGE',pair:'XDGUSD'},
+  {sym:'AVAX',pair:'AVAXUSD'},{sym:'XRP',pair:'XXRPZUSD'},
+  {sym:'LINK',pair:'LINKUSD'},{sym:'BNB',pair:'BNBUSD'},
+  {sym:'POL',pair:'POLUSD'},{sym:'ADA',pair:'ADAUSD'},
+  {sym:'DOT',pair:'DOTUSD'}
+];
+
+// ── STOCK TICKER (Yahoo Finance) ──────────────────────────────
+var TICKER_STOCKS=[
+  'COIN','MSTR','MARA','RIOT','CLSK','HOOD',
+  'NVDA','MSFT','GOOGL','META','PLTR','AMD',
+  'TSLA','ARKK','SQ','PYPL','SOFI'
 ];
 
 function loadStocks(){
-  var promises=STOCKS.map(function(s){
-    return fetch(PROXY+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+s.sym+'?interval=1d&range=2d'))
+  var items=[];
+
+  // Load crypto from Kraken
+  var cryptoPromises=TICKER_CRYPTO.map(function(c){
+    return fetch('https://api.kraken.com/0/public/Ticker?pair='+c.pair)
+      .then(function(r){return r.json()})
+      .catch(function(){return null})
+      .then(function(d){
+        if(!d||!d.result)return null;
+        var info=d.result[c.pair];
+        if(!info)return null;
+        var price=parseFloat(info.c[0]),open=parseFloat(info.o);
+        var chg=open>0?(price-open)/open*100:0;
+        var pStr=price>100?'$'+price.toLocaleString(undefined,{maximumFractionDigits:0}):'$'+price.toFixed(4);
+        return{sym:c.sym,price:pStr,change:chg.toFixed(2),up:chg>=0,isCrypto:true};
+      }).catch(function(){return null});
+  });
+
+  // Load stocks from Yahoo via proxy
+  var stockPromises=TICKER_STOCKS.map(function(sym){
+    return fetch(PROXY+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d&range=2d'))
       .then(function(r){return r.json()})
       .then(function(d){
         if(!d.chart||!d.chart.result||!d.chart.result[0])return null;
@@ -615,18 +647,23 @@ function loadStocks(){
         var prev=parseFloat(meta.previousClose||meta.chartPreviousClose);
         if(isNaN(cur)||isNaN(prev)||prev===0)return null;
         var chg=(cur-prev)/prev*100;
-        return{sym:s.sym,name:s.name,price:cur.toFixed(2),change:chg.toFixed(2),up:chg>=0};
+        return{sym:sym,price:'$'+cur.toFixed(2),change:chg.toFixed(2),up:chg>=0,isCrypto:false};
       }).catch(function(){return null});
   });
-  Promise.all(promises).then(function(results){
+
+  Promise.all(cryptoPromises.concat(stockPromises)).then(function(results){
     var valid=results.filter(function(r){return r!==null});
     if(!valid.length)return;
     var html=valid.map(function(s){
       var col=s.up?'#3fb950':'#f85149';
       var arr=s.up?'&#9650;':'&#9660;';
-      return'<div style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;border-right:1px solid #21262d;font-size:12px;">'
+      var tag=s.isCrypto
+        ? '<span style="font-size:9px;color:#f0883e;margin-right:2px;">&#9679;</span>'
+        : '<span style="font-size:9px;color:#388bfd;margin-right:2px;">&#9632;</span>';
+      return'<div style="display:inline-flex;align-items:center;gap:6px;padding:0 18px;border-right:1px solid #21262d;font-size:12px;">'
+        +tag
         +'<span style="font-weight:700;color:#e6edf3;">'+s.sym+'</span>'
-        +'<span style="color:#8b949e;">$'+s.price+'</span>'
+        +'<span style="color:#8b949e;">'+s.price+'</span>'
         +'<span style="font-size:11px;font-weight:600;color:'+col+';">'+arr+' '+(s.up?'+':'')+s.change+'%</span>'
         +'</div>';
     }).join('');
