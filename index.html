@@ -160,6 +160,23 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
     <div class="cd-unit"><div class="cd-num" id="cdS">--</div><div class="cd-lbl">Secs</div></div>
   </div>
 </div>
+
+<!-- ── STOCK TICKER ── -->
+<div style="background:#161b22;border:1px solid #21262d;border-radius:8px;overflow:hidden;margin-bottom:16px;position:relative;">
+  <div style="position:absolute;left:0;top:0;bottom:0;width:48px;background:linear-gradient(90deg,#161b22,transparent);z-index:2;pointer-events:none;"></div>
+  <div style="position:absolute;right:0;top:0;bottom:0;width:48px;background:linear-gradient(270deg,#161b22,transparent);z-index:2;pointer-events:none;"></div>
+  <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f0883e;z-index:3;">Stocks</div>
+  <div style="overflow:hidden;white-space:nowrap;">
+    <div id="tickerTrack" style="display:inline-flex;animation:tickerScroll 30s linear infinite;padding:10px 0;" onmouseover="this.style.animationPlayState='paused'" onmouseout="this.style.animationPlayState='running'">
+      <div id="tickerInner" style="display:inline-flex;"></div>
+      <div id="tickerInner2" style="display:inline-flex;"></div>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+</style>
+
 <div class="fighter-row">
   <div class="fighter teresa">
     <div class="fighter-inner">
@@ -579,9 +596,51 @@ function renderChart(tT,oT){
 }
 
 // ── MAIN ──────────────────────────────────────────────────────
+var STOCKS=[
+  {sym:'COIN',name:'Coinbase'},{sym:'MSTR',name:'MicroStrategy'},
+  {sym:'MARA',name:'Marathon'},{sym:'NVDA',name:'Nvidia'},
+  {sym:'TSLA',name:'Tesla'},{sym:'HOOD',name:'Robinhood'},
+  {sym:'PLTR',name:'Palantir'},{sym:'SQ',name:'Block'}
+];
+
+function loadStocks(){
+  var promises=STOCKS.map(function(s){
+    return fetch(PROXY+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+s.sym+'?interval=1d&range=2d'))
+      .then(function(r){return r.json()})
+      .then(function(d){
+        if(!d.chart||!d.chart.result||!d.chart.result[0])return null;
+        var meta=d.chart.result[0].meta;
+        if(!meta)return null;
+        var cur=parseFloat(meta.regularMarketPrice);
+        var prev=parseFloat(meta.previousClose||meta.chartPreviousClose);
+        if(isNaN(cur)||isNaN(prev)||prev===0)return null;
+        var chg=(cur-prev)/prev*100;
+        return{sym:s.sym,name:s.name,price:cur.toFixed(2),change:chg.toFixed(2),up:chg>=0};
+      }).catch(function(){return null});
+  });
+  Promise.all(promises).then(function(results){
+    var valid=results.filter(function(r){return r!==null});
+    if(!valid.length)return;
+    var html=valid.map(function(s){
+      var col=s.up?'#3fb950':'#f85149';
+      var arr=s.up?'&#9650;':'&#9660;';
+      return'<div style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;border-right:1px solid #21262d;font-size:12px;">'
+        +'<span style="font-weight:700;color:#e6edf3;">'+s.sym+'</span>'
+        +'<span style="color:#8b949e;">$'+s.price+'</span>'
+        +'<span style="font-size:11px;font-weight:600;color:'+col+';">'+arr+' '+(s.up?'+':'')+s.change+'%</span>'
+        +'</div>';
+    }).join('');
+    var t1=document.getElementById('tickerInner');
+    var t2=document.getElementById('tickerInner2');
+    if(t1)t1.innerHTML=html;
+    if(t2)t2.innerHTML=html;
+  });
+}
+
 window.loadAll=function(){
   set('lastUpdate','Refreshing...');
   playClick();
+  loadStocks();
 
   Promise.all([loadSheet(), loadPrices(), loadFG()])
     .then(function(res){
