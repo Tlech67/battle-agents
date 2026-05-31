@@ -76,17 +76,24 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .p-val{color:#e6edf3}
 .p-chg{font-size:11px}
 .p-chg.up{color:#3fb950}.p-chg.dn{color:#f85149}
-.coin-block{padding:8px 0;border-bottom:1px solid #21262d}
+.coin-block{padding:9px 0;border-bottom:1px solid #21262d}
 .coin-block:last-child{border-bottom:none}
-.coin-top{display:flex;justify-content:space-between;align-items:center;font-size:13px}
-.sent-wrap{display:flex;align-items:center;gap:8px;margin-top:6px}
-.sent-bar{display:flex;gap:3px;flex:1}
+.coin-top{display:flex;justify-content:space-between;align-items:baseline}
+.coin-top .p-coin{font-size:14px;font-weight:600}
+.coin-top .p-val{font-size:14px}
+.coin-sub{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
+.sent-wrap{display:flex;align-items:center;gap:7px}
+.sent-bar{display:flex;gap:2px;width:52px;flex:none}
 .sent-seg{flex:1;height:4px;border-radius:2px;background:#21262d;transition:background 0.4s}
 .sent-seg.on.weak{background:#f85149}
 .sent-seg.on.neutral{background:#f0883e}
 .sent-seg.on.strong{background:#3fb950}
-.sent-lbl{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;min-width:52px;text-align:right}
+.sent-lbl{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
 .sent-lbl.weak{color:#f85149}.sent-lbl.neutral{color:#f0883e}.sent-lbl.strong{color:#3fb950}
+.price-help{font-size:10px;color:#7d8590;line-height:1.7;margin:-4px 0 14px}
+.price-help .lg{display:inline-flex;align-items:center;gap:4px;margin-right:12px;white-space:nowrap}
+.price-help .sw{width:8px;height:8px;border-radius:2px;display:inline-block}
+.price-help .sw.weak{background:#f85149}.price-help .sw.neutral{background:#f0883e}.price-help .sw.strong{background:#3fb950}
 .tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid #21262d}
 .tab{background:none;border:none;color:#7d8590;font-size:13px;font-weight:600;padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
 .tab:hover{color:#e6edf3}
@@ -106,6 +113,23 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .cc-price{flex:1;color:#e6edf3}
 .cc-x{background:none;border:none;color:#7d8590;font-size:18px;cursor:pointer;line-height:1;padding:0 4px}
 .cc-x:hover{color:#f85149}
+.check-input-wrap{position:relative;flex:1}
+.check-input-wrap .check-input{width:100%}
+.suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#161b22;border:1px solid #30363d;border-radius:8px;max-height:240px;overflow-y:auto;z-index:50;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.suggest.open{display:block}
+.suggest-item{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #21262d}
+.suggest-item:last-child{border-bottom:none}
+.suggest-item:hover,.suggest-item.active{background:#1f2630}
+.si-sym{font-weight:600;color:#e6edf3;font-size:13px;min-width:48px}
+.si-name{color:#7d8590;font-size:12px}
+.cc-range{margin-top:12px}
+.cc-range-bar{position:relative;height:5px;background:#21262d;border-radius:3px}
+.cc-range-fill{position:absolute;inset:0;border-radius:3px;background:linear-gradient(90deg,#f85149,#f0883e,#3fb950);opacity:0.30}
+.cc-range-mark{position:absolute;top:-3px;width:3px;height:11px;border-radius:2px;background:#e6edf3;transform:translateX(-50%)}
+.cc-range-ends{display:flex;justify-content:space-between;font-size:10px;color:#7d8590;margin-top:4px}
+.cc-stats{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+.cc-stat{font-size:10px;color:#7d8590;text-transform:uppercase;letter-spacing:0.04em}
+.cc-stat b{display:block;color:#e6edf3;font-weight:600;font-size:13px;letter-spacing:0;text-transform:none;margin-top:3px}
 .trade-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #21262d;font-size:12px}
 .trade-row:last-child{border-bottom:none}
 .tbadge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;flex-shrink:0;margin-top:2px}
@@ -196,6 +220,15 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 
   /* Ticker smaller */
   .ticker-track .ticker-item{font-size:11px;padding:0 12px}
+
+  /* Tabs + Coin Check tab — mobile tuning */
+  .tab{padding:12px 14px;font-size:14px}
+  .check-input{font-size:16px;padding:11px 12px}   /* 16px stops iOS focus-zoom */
+  .check-btn{font-size:15px;padding:11px 18px}
+  .cc-x{font-size:24px;padding:6px 10px}           /* bigger thumb target */
+  .cc-top{flex-wrap:wrap}
+  .suggest-item{padding:12px}
+  .cc-stats{gap:12px}
 }
 
 @media(max-width:420px){
@@ -341,7 +374,10 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 <div class="grid2">
   <div class="panel">
     <div class="p-title">Live Prices &mdash; 10-Coin Battle Universe</div>
-    <div style="font-size:10px;color:#7d8590;margin:-6px 0 10px">Bars = short-term sentiment (today's momentum)</div>
+    <div class="price-help">
+      Each bar reads today's price momentum (current vs. the day's open) &mdash; a quick gauge of direction, not a buy signal.<br>
+      <span class="lg"><span class="sw weak"></span>Weak &le; &minus;1.5%</span><span class="lg"><span class="sw neutral"></span>Neutral (flat)</span><span class="lg"><span class="sw strong"></span>Strong &ge; +1.5%</span>
+    </div>
     <div id="priceList"><div class="empty">Loading prices...</div></div>
   </div>
   <div class="panel">
@@ -404,9 +440,12 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 <div id="tab-check" class="tab-panel">
   <div class="panel" style="margin-bottom:16px">
     <div class="p-title">Coin Sentiment Check &mdash; Omar's Lookup</div>
-    <div style="font-size:11px;color:#7d8590;margin:-4px 0 12px">Plug in any Kraken-listed coin (outside the 10-coin battle universe) for live price and short-term sentiment. Saved on this device.</div>
+    <div style="font-size:11px;color:#7d8590;margin:-4px 0 12px">Search any Kraken-listed coin by ticker or name. Each card shows live price, today's sentiment, 24h range, high/low and volume. Your list saves on this device.</div>
     <div class="check-input-row">
-      <input id="checkInput" class="check-input" type="text" maxlength="12" placeholder="Ticker — e.g. ATOM, INJ, TIA, PEPE" onkeydown="checkInputKey(event)" autocomplete="off">
+      <div class="check-input-wrap">
+        <input id="checkInput" class="check-input" type="text" maxlength="14" placeholder="Search — e.g. SOL, solana, link" oninput="checkSuggest()" onfocus="checkSuggest()" onblur="setTimeout(hideSuggest,150)" onkeydown="checkInputKey(event)" autocomplete="off">
+        <div id="suggestBox" class="suggest"></div>
+      </div>
       <button class="check-btn" onclick="addCheckCoin()">Add</button>
     </div>
   </div>
@@ -665,8 +704,8 @@ function renderPrices(p){
     var sn=sentiment(pp.change),segs='';
     for(var i=0;i<3;i++){segs+='<div class="sent-seg'+(i===sn.idx?' on '+sn.key:'')+'"></div>'}
     return'<div class="coin-block">'+
-      '<div class="coin-top"><span class="p-coin">'+c+'</span><span class="p-val">'+pStr+'</span><span class="p-chg '+cls+'">'+s+pp.change.toFixed(2)+'%</span></div>'+
-      '<div class="sent-wrap"><div class="sent-bar">'+segs+'</div><span class="sent-lbl '+sn.key+'">'+sn.label+'</span></div>'+
+      '<div class="coin-top"><span class="p-coin">'+c+'</span><span class="p-val">'+pStr+'</span></div>'+
+      '<div class="coin-sub"><div class="sent-wrap"><div class="sent-bar">'+segs+'</div><span class="sent-lbl '+sn.key+'">'+sn.label+'</span></div><span class="p-chg '+cls+'">'+s+pp.change.toFixed(2)+'%</span></div>'+
       '</div>';
   }).join('');
 }
@@ -925,61 +964,189 @@ window.showTab=function(name){
   if(name==='check')renderCheck();
 };
 
+// ── COIN UNIVERSE for search/suggestions (Kraken USD pairs) ──
+// Fetched once, cached 24h. Guarantees every suggestion is priceable.
+var UNIV_KEY='krakenUniverseV1';
+var universe=[];          // [{sym:'SOL',name:'Solana'}]
+var univBySym={};
+var NAME_MAP={
+  BTC:'Bitcoin',ETH:'Ethereum',SOL:'Solana',XRP:'Ripple',ADA:'Cardano',
+  DOGE:'Dogecoin',DOT:'Polkadot',LINK:'Chainlink',AVAX:'Avalanche',POL:'Polygon',
+  MATIC:'Polygon',LTC:'Litecoin',BCH:'Bitcoin Cash',ATOM:'Cosmos',UNI:'Uniswap',
+  AAVE:'Aave',ALGO:'Algorand',XLM:'Stellar',TRX:'Tron',NEAR:'NEAR Protocol',
+  INJ:'Injective',TIA:'Celestia',SUI:'Sui',APT:'Aptos',ARB:'Arbitrum',
+  OP:'Optimism',FIL:'Filecoin',ICP:'Internet Computer',ETC:'Ethereum Classic',XMR:'Monero',
+  XTZ:'Tezos',SAND:'The Sandbox',MANA:'Decentraland',GRT:'The Graph',RNDR:'Render',
+  FET:'Fetch.ai',PEPE:'Pepe',SHIB:'Shiba Inu',WIF:'dogwifhat',BONK:'Bonk',
+  JUP:'Jupiter',SEI:'Sei',LDO:'Lido DAO',MKR:'Maker',CRV:'Curve',
+  SNX:'Synthetix',COMP:'Compound',ENS:'Ethereum Name Service',IMX:'Immutable',TAO:'Bittensor'
+};
+function indexUniverse(){univBySym={};universe.forEach(function(o){univBySym[o.sym]=o})}
+function buildUniverse(pairs){
+  var seen={},arr=[];
+  Object.keys(pairs).forEach(function(k){
+    var ws=pairs[k].wsname||'';
+    if(ws.indexOf('/USD')<0)return;          // USD-quoted only
+    var base=ws.split('/')[0];
+    if(base==='XBT')base='BTC';
+    base=base.replace(/[^A-Z0-9]/g,'');
+    if(!base||seen[base])return; seen[base]=1;
+    arr.push({sym:base,name:NAME_MAP[base]||''});
+  });
+  arr.sort(function(a,b){return a.sym<b.sym?-1:1});
+  return arr;
+}
+function loadUniverse(){
+  try{
+    var c=JSON.parse(localStorage.getItem(UNIV_KEY)||'null');
+    if(c&&c.t&&(Date.now()-c.t<86400000)&&c.u&&c.u.length){universe=c.u;indexUniverse();return}
+  }catch(e){}
+  var url='https://api.kraken.com/0/public/AssetPairs';
+  fetch(url).then(function(r){return r.json()})
+    .catch(function(){return fetch(PROXY+encodeURIComponent(url)).then(function(r){return r.json()})})
+    .then(function(d){
+      if(!d||!d.result)return;
+      universe=buildUniverse(d.result);
+      indexUniverse();
+      try{localStorage.setItem(UNIV_KEY,JSON.stringify({t:Date.now(),u:universe}))}catch(e){}
+    }).catch(function(){});
+}
+
+// ── SUGGESTIONS DROPDOWN ──────────────────────────────────────
+window.checkSuggest=function(){
+  var inp=document.getElementById('checkInput'), box=document.getElementById('suggestBox');
+  if(!inp||!box)return;
+  var q=(inp.value||'').toUpperCase().replace(/[^A-Z0-9]/g,''), ql=q.toLowerCase();
+  if(!q||!universe.length){hideSuggest();return}
+  var pref=[],sub=[];
+  universe.forEach(function(o){
+    if(o.sym.indexOf(q)===0)pref.push(o);
+    else if(o.sym.indexOf(q)>0||(o.name&&o.name.toLowerCase().indexOf(ql)>=0))sub.push(o);
+  });
+  var list=pref.concat(sub).slice(0,8);
+  if(!list.length){hideSuggest();return}
+  box.innerHTML=list.map(function(o,i){
+    return'<div class="suggest-item'+(i===0?' active':'')+'" onmousedown="pickSuggest(\''+o.sym+'\')"><span class="si-sym">'+o.sym+'</span><span class="si-name">'+(o.name||'')+'</span></div>';
+  }).join('');
+  box.className='suggest open';
+};
+window.hideSuggest=function(){var b=document.getElementById('suggestBox');if(b){b.className='suggest';b.innerHTML=''}};
+window.pickSuggest=function(sym){var inp=document.getElementById('checkInput');if(inp)inp.value=sym;addCheckCoinSym(sym)};
+
+// Resolve typed text -> ticker (exact ticker, else name match, else raw)
+function resolveSym(raw){
+  raw=(raw||'').trim(); if(!raw)return'';
+  var up=raw.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(univBySym[up])return up;
+  var low=raw.toLowerCase();
+  var exact=universe.filter(function(o){return o.name&&o.name.toLowerCase()===low});
+  if(exact.length)return exact[0].sym;
+  var part=universe.filter(function(o){return o.name&&o.name.toLowerCase().indexOf(low)>=0});
+  if(part.length)return part[0].sym;
+  return up;
+}
+
+function addCheckCoinSym(sym){
+  sym=(sym||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
+  if(!sym)return;
+  if(checkCoins.indexOf(sym)<0){checkCoins.push(sym);saveCheckCoins()}
+  var inp=document.getElementById('checkInput'); if(inp)inp.value='';
+  hideSuggest(); playClick(); renderCheck();
+}
+window.addCheckCoin=function(){var inp=document.getElementById('checkInput');addCheckCoinSym(resolveSym(inp?inp.value:''))};
+
+window.checkInputKey=function(e){
+  var box=document.getElementById('suggestBox');
+  var open=box&&box.className.indexOf('open')>=0;
+  var items=open?box.querySelectorAll('.suggest-item'):[];
+  if(open&&(e.key==='ArrowDown'||e.key==='ArrowUp')){
+    e.preventDefault();
+    var idx=-1,i;
+    for(i=0;i<items.length;i++){if(items[i].className.indexOf('active')>=0)idx=i}
+    for(i=0;i<items.length;i++)items[i].className='suggest-item';
+    idx=e.key==='ArrowDown'?(idx+1)%items.length:(idx-1+items.length)%items.length;
+    items[idx].className='suggest-item active';
+    return;
+  }
+  if(e.key==='Enter'){
+    if(open){var act=box.querySelector('.suggest-item.active'); if(act){pickSuggest(act.querySelector('.si-sym').textContent);return}}
+    window.addCheckCoin();
+  }
+  if(e.key==='Escape')hideSuggest();
+};
+
+window.removeCheckCoin=function(sym){
+  checkCoins=checkCoins.filter(function(c){return c!==sym});
+  saveCheckCoins(); renderCheck();
+};
+
+// ── PRICE + 24H DETAIL from one Kraken Ticker call ───────────
 function fetchCheckCoin(sym){
-  sym=(sym||'').toUpperCase().replace(/[^A-Z0-9]/g,'');   // whitelist: tickers are alphanumeric only
-  var q=(sym==='BTC'?'XBT':sym)+'USD';   // Kraken lists Bitcoin as XBT
+  sym=(sym||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  var q=(sym==='BTC'?'XBT':sym)+'USD';
   var url='https://api.kraken.com/0/public/Ticker?pair='+encodeURIComponent(q);
   return fetch(url).then(function(r){return r.json()})
     .catch(function(){return fetch(PROXY+encodeURIComponent(url)).then(function(r){return r.json()})})
     .then(function(d){
       if(!d||!d.result||(d.error&&d.error.length))return{sym:sym,error:true};
-      var key=Object.keys(d.result)[0];   // take canonical key, whatever Kraken names it
+      var key=Object.keys(d.result)[0];
       if(!key)return{sym:sym,error:true};
       var info=d.result[key];
       var price=parseFloat(info.c[0]),open=parseFloat(info.o);
-      return{sym:sym,price:price,change:open>0?(price-open)/open*100:0,error:false};
+      return{sym:sym,error:false,price:price,
+        change:open>0?(price-open)/open*100:0,
+        high:info.h?parseFloat(info.h[1]):null,   // 24h high
+        low: info.l?parseFloat(info.l[1]):null,    // 24h low
+        vol: info.v?parseFloat(info.v[1]):null,    // 24h base volume
+        vwap:info.p?parseFloat(info.p[1]):null};   // 24h vol-weighted avg price
     }).catch(function(){return{sym:sym,error:true}});
 }
 
-window.addCheckCoin=function(){
-  var inp=document.getElementById('checkInput');
-  var sym=(inp.value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
-  if(!sym)return;
-  if(checkCoins.indexOf(sym)<0){checkCoins.push(sym);saveCheckCoins()}
-  inp.value='';
-  playClick();
-  renderCheck();
-};
-
-window.checkInputKey=function(e){if(e.key==='Enter')window.addCheckCoin()};
-
-window.removeCheckCoin=function(sym){
-  checkCoins=checkCoins.filter(function(c){return c!==sym});
-  saveCheckCoins();
-  renderCheck();
-};
+function ccPrice(v){return v>100?'$'+v.toLocaleString(undefined,{maximumFractionDigits:0}):'$'+v.toFixed(4)}
+function ccVol(v){
+  if(v==null||isNaN(v))return'\u2014';
+  if(v>=1e9)return(v/1e9).toFixed(2)+'B';
+  if(v>=1e6)return(v/1e6).toFixed(2)+'M';
+  if(v>=1e3)return(v/1e3).toFixed(1)+'K';
+  return v.toFixed(0);
+}
 
 function renderCheck(){
   var el=document.getElementById('checkList');
   if(!el)return;
-  if(!checkCoins.length){el.innerHTML='<div class="empty">No coins yet. Add one above to see its live sentiment.</div>';return}
+  if(!checkCoins.length){el.innerHTML='<div class="empty">No coins yet. Search by ticker or name above to add one.</div>';return}
   el.innerHTML=checkCoins.map(function(sym){
-    return'<div class="check-card" id="cc-'+sym+'"><div class="cc-top"><span class="cc-sym">'+sym+'</span><span class="cc-price">Loading...</span><button class="cc-x" onclick="removeCheckCoin(\''+sym+'\')">&times;</button></div></div>';
+    return'<div class="check-card" id="cc-'+sym+'"><div class="cc-top"><span class="cc-sym">'+sym+'</span><span class="cc-price">Loading\u2026</span><button class="cc-x" onclick="removeCheckCoin(\''+sym+'\')">&times;</button></div></div>';
   }).join('');
   checkCoins.forEach(function(sym){
     fetchCheckCoin(sym).then(function(r){
       var card=document.getElementById('cc-'+sym);
       if(!card)return;
+      var xBtn='<button class="cc-x" onclick="removeCheckCoin(\''+sym+'\')">&times;</button>';
       if(r.error){
-        card.innerHTML='<div class="cc-top"><span class="cc-sym">'+sym+'</span><span class="cc-price" style="color:#f85149">Not on Kraken</span><button class="cc-x" onclick="removeCheckCoin(\''+sym+'\')">&times;</button></div>';
+        card.innerHTML='<div class="cc-top"><span class="cc-sym">'+sym+'</span><span class="cc-price" style="color:#f85149">Not on Kraken</span>'+xBtn+'</div>';
         return;
       }
-      var cls=r.change>=0?'up':'dn',s=r.change>=0?'+':'';
-      var pStr=r.price>100?'$'+r.price.toLocaleString(undefined,{maximumFractionDigits:0}):'$'+r.price.toFixed(4);
-      var sn=sentiment(r.change),segs='';
+      var nm=(univBySym[sym]&&univBySym[sym].name)||NAME_MAP[sym]||'';
+      var cls=r.change>=0?'up':'dn', s=r.change>=0?'+':'';
+      var sn=sentiment(r.change), segs='';
       for(var i=0;i<3;i++){segs+='<div class="sent-seg'+(i===sn.idx?' on '+sn.key:'')+'"></div>'}
-      card.innerHTML='<div class="cc-top"><span class="cc-sym">'+sym+'</span><span class="cc-price">'+pStr+' <span class="p-chg '+cls+'">'+s+r.change.toFixed(2)+'%</span></span><button class="cc-x" onclick="removeCheckCoin(\''+sym+'\')">&times;</button></div>'+
-        '<div class="sent-wrap"><div class="sent-bar">'+segs+'</div><span class="sent-lbl '+sn.key+'">'+sn.label+'</span></div>';
+      var rangeHtml='';
+      if(r.high!=null&&r.low!=null&&r.high>r.low){
+        var pos=Math.max(0,Math.min(100,(r.price-r.low)/(r.high-r.low)*100));
+        rangeHtml='<div class="cc-range"><div class="cc-range-bar"><div class="cc-range-fill"></div><div class="cc-range-mark" style="left:'+pos.toFixed(1)+'%"></div></div>'+
+          '<div class="cc-range-ends"><span>'+ccPrice(r.low)+'</span><span>24h range</span><span>'+ccPrice(r.high)+'</span></div></div>';
+      }
+      var stats='<div class="cc-stats">'+
+        '<div class="cc-stat">24h High<b>'+(r.high!=null?ccPrice(r.high):'\u2014')+'</b></div>'+
+        '<div class="cc-stat">24h Low<b>'+(r.low!=null?ccPrice(r.low):'\u2014')+'</b></div>'+
+        '<div class="cc-stat">24h Vol<b>'+ccVol(r.vol)+' '+sym+'</b></div>'+
+        (r.vwap!=null?'<div class="cc-stat">VWAP<b>'+ccPrice(r.vwap)+'</b></div>':'')+
+      '</div>';
+      card.innerHTML=
+        '<div class="cc-top"><span class="cc-sym">'+sym+(nm?' <span class="si-name">'+nm+'</span>':'')+'</span><span class="cc-price">'+ccPrice(r.price)+' <span class="p-chg '+cls+'">'+s+r.change.toFixed(2)+'%</span></span>'+xBtn+'</div>'+
+        '<div class="sent-wrap" style="margin-top:8px"><div class="sent-bar">'+segs+'</div><span class="sent-lbl '+sn.key+'">'+sn.label+'</span></div>'+
+        rangeHtml+stats;
     });
   });
 }
@@ -990,7 +1157,8 @@ setInterval(function(){
   if(p&&p.className.indexOf('active')>=0)renderCheck();
 },60000);
 
-renderCheck();   // prime saved coins on load
+loadUniverse();   // populate search suggestions
+renderCheck();    // prime saved coins on load
 
 })();
 </script>
