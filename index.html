@@ -76,6 +76,36 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .p-val{color:#e6edf3}
 .p-chg{font-size:11px}
 .p-chg.up{color:#3fb950}.p-chg.dn{color:#f85149}
+.coin-block{padding:8px 0;border-bottom:1px solid #21262d}
+.coin-block:last-child{border-bottom:none}
+.coin-top{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.sent-wrap{display:flex;align-items:center;gap:8px;margin-top:6px}
+.sent-bar{display:flex;gap:3px;flex:1}
+.sent-seg{flex:1;height:4px;border-radius:2px;background:#21262d;transition:background 0.4s}
+.sent-seg.on.weak{background:#f85149}
+.sent-seg.on.neutral{background:#f0883e}
+.sent-seg.on.strong{background:#3fb950}
+.sent-lbl{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;min-width:52px;text-align:right}
+.sent-lbl.weak{color:#f85149}.sent-lbl.neutral{color:#f0883e}.sent-lbl.strong{color:#3fb950}
+.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid #21262d}
+.tab{background:none;border:none;color:#7d8590;font-size:13px;font-weight:600;padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:#e6edf3}
+.tab.active{color:#e6edf3;border-bottom-color:#f0883e}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.check-input-row{display:flex;gap:8px}
+.check-input{flex:1;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:6px;padding:9px 12px;font-size:13px;text-transform:uppercase}
+.check-input:focus{outline:none;border-color:#f0883e}
+.check-input::placeholder{color:#4d555f;text-transform:none}
+.check-btn{background:#f0883e;border:none;color:#0d1117;font-weight:600;font-size:13px;padding:9px 18px;border-radius:6px;cursor:pointer}
+.check-btn:hover{background:#f59c5c}
+.check-card{padding:10px 0;border-bottom:1px solid #21262d}
+.check-card:last-child{border-bottom:none}
+.cc-top{display:flex;align-items:center;gap:10px;font-size:14px}
+.cc-sym{font-weight:600;color:#e6edf3;min-width:54px}
+.cc-price{flex:1;color:#e6edf3}
+.cc-x{background:none;border:none;color:#7d8590;font-size:18px;cursor:pointer;line-height:1;padding:0 4px}
+.cc-x:hover{color:#f85149}
 .trade-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #21262d;font-size:12px}
 .trade-row:last-child{border-bottom:none}
 .tbadge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;flex-shrink:0;margin-top:2px}
@@ -191,6 +221,13 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
     <button class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
   </div>
 </div>
+
+<div class="tabs">
+  <button class="tab active" id="tabBtnBattle" onclick="showTab('battle')">&#9876; Battle</button>
+  <button class="tab" id="tabBtnCheck" onclick="showTab('check')">&#128269; Coin Check</button>
+</div>
+
+<div id="tab-battle" class="tab-panel active">
 <div class="countdown-banner">
   <div class="cd-left">
     <div class="cd-challenge">&#9876; Active Challenge</div>
@@ -304,6 +341,7 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 <div class="grid2">
   <div class="panel">
     <div class="p-title">Live Prices &mdash; 10-Coin Battle Universe</div>
+    <div style="font-size:10px;color:#7d8590;margin:-6px 0 10px">Bars = short-term sentiment (today's momentum)</div>
     <div id="priceList"><div class="empty">Loading prices...</div></div>
   </div>
   <div class="panel">
@@ -359,6 +397,22 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
       <tr><td>Trades</td><td id="sc3T">--</td><td id="sc3O">--</td></tr>
       <tr class="score-total"><td>Leader</td><td colspan="2" id="scLdr" style="text-align:right">--</td></tr>
     </table>
+  </div>
+</div>
+</div><!-- /tab-battle -->
+
+<div id="tab-check" class="tab-panel">
+  <div class="panel" style="margin-bottom:16px">
+    <div class="p-title">Coin Sentiment Check &mdash; Omar's Lookup</div>
+    <div style="font-size:11px;color:#7d8590;margin:-4px 0 12px">Plug in any Kraken-listed coin (outside the 10-coin battle universe) for live price and short-term sentiment. Saved on this device.</div>
+    <div class="check-input-row">
+      <input id="checkInput" class="check-input" type="text" maxlength="12" placeholder="Ticker — e.g. ATOM, INJ, TIA, PEPE" onkeydown="checkInputKey(event)" autocomplete="off">
+      <button class="check-btn" onclick="addCheckCoin()">Add</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="p-title">Watchlist</div>
+    <div id="checkList"><div class="empty">No coins yet. Add one above to see its live sentiment.</div></div>
   </div>
 </div>
 
@@ -591,6 +645,16 @@ function renderHoldings(id,h,p){
   }).join('');
 }
 
+// Short-term sentiment from today's momentum.
+// Buckets tie to Teresa's momentumThreshold (1.5%) so the bar
+// agrees with what the bots actually act on. Tune SENT_BAND to taste.
+var SENT_BAND = 1.5;
+function sentiment(chg){
+  if(chg>=SENT_BAND)return{key:'strong',label:'Strong',idx:2};
+  if(chg<=-SENT_BAND)return{key:'weak',label:'Weak',idx:0};
+  return{key:'neutral',label:'Neutral',idx:1};
+}
+
 function renderPrices(p){
   var el=document.getElementById('priceList');
   var coins=Object.keys(p);
@@ -598,7 +662,12 @@ function renderPrices(p){
   el.innerHTML=coins.map(function(c){
     var pp=p[c],cls=pp.change>=0?'up':'dn',s=pp.change>=0?'+':'';
     var pStr=pp.price>100?'$'+pp.price.toLocaleString(undefined,{maximumFractionDigits:0}):'$'+pp.price.toFixed(4);
-    return'<div class="price-row"><span class="p-coin">'+c+'</span><span class="p-val">'+pStr+'</span><span class="p-chg '+cls+'">'+s+pp.change.toFixed(2)+'%</span></div>';
+    var sn=sentiment(pp.change),segs='';
+    for(var i=0;i<3;i++){segs+='<div class="sent-seg'+(i===sn.idx?' on '+sn.key:'')+'"></div>'}
+    return'<div class="coin-block">'+
+      '<div class="coin-top"><span class="p-coin">'+c+'</span><span class="p-val">'+pStr+'</span><span class="p-chg '+cls+'">'+s+pp.change.toFixed(2)+'%</span></div>'+
+      '<div class="sent-wrap"><div class="sent-bar">'+segs+'</div><span class="sent-lbl '+sn.key+'">'+sn.label+'</span></div>'+
+      '</div>';
   }).join('');
 }
 
@@ -837,6 +906,91 @@ window.loadAll=function(){
 
 loadAll();
 setInterval(loadAll,60000);
+
+// ── COIN CHECK TAB (Omar's personal lookup) ──────────────────
+// Reuses sentiment(), PROXY, playClick from above. Watchlist
+// persists per-device via localStorage (degrades gracefully if blocked).
+var CHECK_KEY='battleCheckCoins';
+var checkCoins=[];
+try{var _saved=localStorage.getItem(CHECK_KEY);if(_saved)checkCoins=JSON.parse(_saved)||[]}catch(e){}
+function saveCheckCoins(){try{localStorage.setItem(CHECK_KEY,JSON.stringify(checkCoins))}catch(e){}}
+
+window.showTab=function(name){
+  ['battle','check'].forEach(function(t){
+    var panel=document.getElementById('tab-'+t);
+    var btn=document.getElementById('tabBtn'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(panel)panel.className='tab-panel'+(t===name?' active':'');
+    if(btn)btn.className='tab'+(t===name?' active':'');
+  });
+  if(name==='check')renderCheck();
+};
+
+function fetchCheckCoin(sym){
+  sym=(sym||'').toUpperCase().replace(/[^A-Z0-9]/g,'');   // whitelist: tickers are alphanumeric only
+  var q=(sym==='BTC'?'XBT':sym)+'USD';   // Kraken lists Bitcoin as XBT
+  var url='https://api.kraken.com/0/public/Ticker?pair='+encodeURIComponent(q);
+  return fetch(url).then(function(r){return r.json()})
+    .catch(function(){return fetch(PROXY+encodeURIComponent(url)).then(function(r){return r.json()})})
+    .then(function(d){
+      if(!d||!d.result||(d.error&&d.error.length))return{sym:sym,error:true};
+      var key=Object.keys(d.result)[0];   // take canonical key, whatever Kraken names it
+      if(!key)return{sym:sym,error:true};
+      var info=d.result[key];
+      var price=parseFloat(info.c[0]),open=parseFloat(info.o);
+      return{sym:sym,price:price,change:open>0?(price-open)/open*100:0,error:false};
+    }).catch(function(){return{sym:sym,error:true}});
+}
+
+window.addCheckCoin=function(){
+  var inp=document.getElementById('checkInput');
+  var sym=(inp.value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
+  if(!sym)return;
+  if(checkCoins.indexOf(sym)<0){checkCoins.push(sym);saveCheckCoins()}
+  inp.value='';
+  playClick();
+  renderCheck();
+};
+
+window.checkInputKey=function(e){if(e.key==='Enter')window.addCheckCoin()};
+
+window.removeCheckCoin=function(sym){
+  checkCoins=checkCoins.filter(function(c){return c!==sym});
+  saveCheckCoins();
+  renderCheck();
+};
+
+function renderCheck(){
+  var el=document.getElementById('checkList');
+  if(!el)return;
+  if(!checkCoins.length){el.innerHTML='<div class="empty">No coins yet. Add one above to see its live sentiment.</div>';return}
+  el.innerHTML=checkCoins.map(function(sym){
+    return'<div class="check-card" id="cc-'+sym+'"><div class="cc-top"><span class="cc-sym">'+sym+'</span><span class="cc-price">Loading...</span><button class="cc-x" onclick="removeCheckCoin(\''+sym+'\')">&times;</button></div></div>';
+  }).join('');
+  checkCoins.forEach(function(sym){
+    fetchCheckCoin(sym).then(function(r){
+      var card=document.getElementById('cc-'+sym);
+      if(!card)return;
+      if(r.error){
+        card.innerHTML='<div class="cc-top"><span class="cc-sym">'+sym+'</span><span class="cc-price" style="color:#f85149">Not on Kraken</span><button class="cc-x" onclick="removeCheckCoin(\''+sym+'\')">&times;</button></div>';
+        return;
+      }
+      var cls=r.change>=0?'up':'dn',s=r.change>=0?'+':'';
+      var pStr=r.price>100?'$'+r.price.toLocaleString(undefined,{maximumFractionDigits:0}):'$'+r.price.toFixed(4);
+      var sn=sentiment(r.change),segs='';
+      for(var i=0;i<3;i++){segs+='<div class="sent-seg'+(i===sn.idx?' on '+sn.key:'')+'"></div>'}
+      card.innerHTML='<div class="cc-top"><span class="cc-sym">'+sym+'</span><span class="cc-price">'+pStr+' <span class="p-chg '+cls+'">'+s+r.change.toFixed(2)+'%</span></span><button class="cc-x" onclick="removeCheckCoin(\''+sym+'\')">&times;</button></div>'+
+        '<div class="sent-wrap"><div class="sent-bar">'+segs+'</div><span class="sent-lbl '+sn.key+'">'+sn.label+'</span></div>';
+    });
+  });
+}
+
+// Keep the watchlist live if Omar leaves the Coin Check tab open
+setInterval(function(){
+  var p=document.getElementById('tab-check');
+  if(p&&p.className.indexOf('active')>=0)renderCheck();
+},60000);
+
+renderCheck();   // prime saved coins on load
 
 })();
 </script>
