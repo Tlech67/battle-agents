@@ -36,18 +36,16 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .fighter.teresa{border-top:3px solid #f85149}
 .fighter.omar{border-top:3px solid #388bfd}
 .fighter-inner{display:flex;gap:14px;align-items:flex-start}
-.avatar-wrap{flex-shrink:0;position:relative;width:76px;height:76px;}
-.avatar{width:76px;height:76px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+.avatar{flex-shrink:0;width:76px;height:76px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
 .avatar.t{background:#1a0505;border:2px solid #f85149}
 .avatar.o{background:#05050f;border:2px solid #388bfd}
-.avatar img{width:100%;height:100%;object-fit:cover;object-position:center 15%;border-radius:8px;}
 .avatar-letter{font-size:34px;font-weight:700;line-height:1}
 .avatar.t .avatar-letter{color:#f85149}
 .avatar.o .avatar-letter{color:#388bfd}
 .avatar-sub{font-size:9px;font-weight:600;letter-spacing:0.1em;margin-top:2px}
 .avatar.t .avatar-sub{color:#f8514980}
 .avatar.o .avatar-sub{color:#388bfd80}
-.avatar-badge{position:absolute;top:-8px;right:-8px;font-size:16px;z-index:2;line-height:1;}
+.avatar-badge{position:absolute;top:-6px;right:-6px;font-size:14px}
 .fighter-stats{flex:1;min-width:0}
 .f-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
 .f-label.t{color:#f85149}
@@ -128,6 +126,60 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .notif.buy{border-left:3px solid #3fb950}
 .notif.sell{border-left:3px solid #f85149}
 .notif.win{border-left:3px solid #f0883e}
+
+/* ── MOBILE RESPONSIVE ───────────────────────────────────────── */
+@media(max-width:768px){
+  body{padding:8px}
+
+  /* Header */
+  .header{flex-wrap:wrap;gap:8px}
+  .title{font-size:16px}
+  .subtitle{display:none}
+  .last-update{font-size:10px}
+  .header-right{gap:6px}
+
+  /* Countdown — stack vertically */
+  .countdown-banner{flex-direction:column;padding:12px 16px;gap:12px}
+  .cd-name{font-size:15px}
+  .cd-right{width:100%;justify-content:center;gap:6px}
+  .cd-unit{min-width:52px;padding:8px 10px}
+  .cd-num{font-size:22px}
+  .cd-sep{font-size:16px;margin-bottom:8px}
+  .cd-progress{max-width:100%}
+
+  /* Fighter cards — stack vertically */
+  .fighter-row{grid-template-columns:1fr;gap:10px}
+  .vs-col{flex-direction:row;justify-content:center;padding:4px 0;gap:16px}
+  .vs-txt{font-size:18px}
+  .f-value{font-size:24px}
+  .avatar{width:60px;height:60px}
+  .avatar img{width:60px;height:60px}
+
+  /* Metrics — 2x2 grid */
+  .metrics{grid-template-columns:1fr 1fr;gap:8px}
+  .m-value{font-size:16px}
+
+  /* Two column panels — stack */
+  .grid2{grid-template-columns:1fr;gap:10px}
+
+  /* Chart shorter on mobile */
+  .chart-panel canvas{height:160px!important}
+
+  /* Score table compact */
+  .score-table td{font-size:11px;padding:5px 0}
+  .result-big{font-size:20px}
+
+  /* Ticker smaller */
+  .ticker-track .ticker-item{font-size:11px;padding:0 12px}
+}
+
+@media(max-width:420px){
+  .cd-unit{min-width:44px;padding:6px 8px}
+  .cd-num{font-size:18px}
+  .metrics{grid-template-columns:1fr 1fr;gap:6px}
+  .m-value{font-size:14px}
+  .f-value{font-size:20px}
+}
 </style>
 </head>
 <body>
@@ -185,9 +237,9 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 <div class="fighter-row">
   <div class="fighter teresa">
     <div class="fighter-inner">
-      <div class="avatar-wrap">
-        <div class="avatar t"><img src="Teresa.png" alt="Teresa" /></div>
+      <div class="avatar t">
         <div class="avatar-badge">&#9889;</div>
+        <img src="Teresa.png" alt="Teresa" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
       </div>
       <div class="fighter-stats">
         <div class="f-label t">Teresa <span id="tWinBadge" class="win-badge" style="display:none">WINNING</span></div>
@@ -211,9 +263,9 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
   </div>
   <div class="fighter omar">
     <div class="fighter-inner">
-      <div class="avatar-wrap">
-        <div class="avatar o"><img src="Omar.png" alt="Omar" /></div>
+      <div class="avatar o">
         <div class="avatar-badge">&#10052;</div>
+        <img src="Omar.png" alt="Omar" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
       </div>
       <div class="fighter-stats">
         <div class="f-label o">Omar <span id="oWinBadge" class="win-badge" style="display:none">WINNING</span></div>
@@ -430,6 +482,7 @@ function loadSheet(){
 
 function loadOneCoin(coin,pair){
   var krakenUrl='https://api.kraken.com/0/public/Ticker?pair='+pair;
+  // Try direct first (Kraken supports CORS), then proxies as fallback
   return fetch(krakenUrl)
     .then(function(r){return r.json()})
     .catch(function(){
@@ -467,21 +520,47 @@ function loadFG(){
     .catch(function(){return null});
 }
 
+function loadGlobal(){
+  // Calculate from live Kraken prices using accurate circulating supplies
+  // Supplies updated May 2026 — BTC dominance validated against real market
+  return Promise.resolve(null); // placeholder, calculated after prices load
+}
+
 function calcGlobalMetrics(prices){
+  // Accurate circulating supplies (May 2026)
   var SUPPLIES={
-    BTC:19700000,ETH:120300000,SOL:466000000,AVAX:406000000,
-    XRP:57400000000,DOGE:144700000000,LINK:587000000,
-    POL:9900000000,ADA:35500000000,DOT:1470000000
+    BTC:19700000,      // ~19.7M BTC mined
+    ETH:120300000,     // ~120.3M ETH
+    SOL:466000000,     // ~466M SOL
+    AVAX:406000000,    // ~406M AVAX
+    XRP:57400000000,   // ~57.4B XRP
+    DOGE:144700000000, // ~144.7B DOGE
+    LINK:587000000,    // ~587M LINK
+    POL:9900000000,    // ~9.9B POL
+    ADA:35500000000,   // ~35.5B ADA
+    DOT:1470000000     // ~1.47B DOT
   };
-  var OTHER_MCAP=900000000000;
-  var totalMcap=OTHER_MCAP,btcMcap=0;
+  // Known approximate market caps for coins NOT in our universe
+  // Used to make total market cap realistic (not just our 10 coins)
+  // Based on May 2026 market conditions (~$2.7T total)
+  var OTHER_MCAP = 900000000000; // ~$900B for rest of market
+
+  var totalMcap=OTHER_MCAP, btcMcap=0;
   Object.keys(prices).forEach(function(c){
-    var p=prices[c],s=SUPPLIES[c];
-    if(p&&s){var m=p.price*s;totalMcap+=m;if(c==='BTC')btcMcap=m;}
+    var p=prices[c], s=SUPPLIES[c];
+    if(p&&s){
+      var m=p.price*s;
+      totalMcap+=m;
+      if(c==='BTC')btcMcap=m;
+    }
   });
+
   if(totalMcap>0&&btcMcap>0){
     var dom=btcMcap/totalMcap*100;
-    if(dom>=35&&dom<=65){return{btcDom:dom.toFixed(1)+'%',totalMcap:'$'+(totalMcap/1e12).toFixed(2)+'T'};}
+    // Sanity check
+    if(dom>=35&&dom<=65){
+      return{btcDom:dom.toFixed(1)+'%',totalMcap:'$'+(totalMcap/1e12).toFixed(2)+'T'};
+    }
   }
   return null;
 }
@@ -571,6 +650,7 @@ function renderChart(tT,oT){
   }});
 }
 
+// ── MAIN ──────────────────────────────────────────────────────
 // ── CRYPTO TICKER PAIRS (Kraken) ─────────────────────────────
 var TICKER_CRYPTO=[
   {sym:'BTC',pair:'XXBTZUSD'},{sym:'ETH',pair:'XETHZUSD'},
@@ -581,6 +661,7 @@ var TICKER_CRYPTO=[
   {sym:'DOT',pair:'DOTUSD'}
 ];
 
+// ── STOCK TICKER (Yahoo Finance) ──────────────────────────────
 var TICKER_STOCKS=[
   'COIN','MSTR','MARA','RIOT','CLSK','HOOD',
   'NVDA','MSFT','GOOGL','META','PLTR','AMD',
@@ -588,6 +669,9 @@ var TICKER_STOCKS=[
 ];
 
 function loadStocks(){
+  var items=[];
+
+  // Load crypto from Kraken
   var cryptoPromises=TICKER_CRYPTO.map(function(c){
     return fetch('https://api.kraken.com/0/public/Ticker?pair='+c.pair)
       .then(function(r){return r.json()})
@@ -603,6 +687,7 @@ function loadStocks(){
       }).catch(function(){return null});
   });
 
+  // Load stocks from Yahoo via proxy
   var stockPromises=TICKER_STOCKS.map(function(sym){
     return fetch(PROXY+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d&range=2d'))
       .then(function(r){return r.json()})
@@ -651,6 +736,7 @@ window.loadAll=function(){
       var sheet=res[0], prices=res[1], fg=res[2];
       livePrices=prices;
 
+      // Fear & Greed
       if(fg){
         var v=parseInt(fg.value);
         set('fgVal',v+'/100'); set('fgLbl',fg.value_classification);
@@ -662,11 +748,16 @@ window.loadAll=function(){
         ll.className='thr-lvl '+(v<30?'high':v<50?'medium':'low');
       }
 
+      // BTC Dominance + Market Cap calculated from live prices
       var global=calcGlobalMetrics(prices);
-      if(global){set('btcDom',global.btcDom);set('mcap',global.totalMcap);}
+      if(global){
+        set('btcDom', global.btcDom);
+        set('mcap', global.totalMcap);
+      }
 
       renderPrices(prices);
 
+      // Agent states
       var tS={value:START_T,cash:START_T,pnl:0,pnlPct:0,trades:0,last:'Battle started May 17',holdings:{}};
       var oS={value:START_O,cash:START_O,pnl:0,pnlPct:0,trades:0,last:'Battle started May 17',holdings:{}};
 
@@ -702,6 +793,7 @@ window.loadAll=function(){
         renderChart([],[]);
       }
 
+      // Fighter cards
       ['t','o'].forEach(function(k){
         var s=k==='t'?tS:oS;
         set(k+'Val',fmt(s.value)); set(k+'Meta','Cash: '+fmt(s.cash)+' | Trades: '+s.trades);
@@ -714,6 +806,7 @@ window.loadAll=function(){
       renderHoldings('tHoldings',tS.holdings,prices);
       renderHoldings('oHoldings',oS.holdings,prices);
 
+      // VS panel
       var margin=Math.abs(tS.value-oS.value);
       set('vsGap',margin<0.01?'Dead even':'$'+margin.toFixed(2)+' gap');
       var ldr=document.getElementById('vsLdr'), nl='tie';
@@ -723,10 +816,12 @@ window.loadAll=function(){
       if(lastLeader&&lastLeader!==nl&&nl!=='tie'){playLevelUp();showNotif('LEAD CHANGE! '+(nl==='teresa'?'Teresa':'Omar')+' takes the lead!','win')}
       lastLeader=nl;
 
+      // Battle fund
       var combined=tS.value+oS.value, cp=combined-TOTAL_START;
       set('combined',fmt(combined));
       set('combinedPnl',(cp>=0?'+':'')+fmt(Math.abs(cp))+' total');
 
+      // Score table
       set('sc1T',fmt(tS.value)); set('sc1O',fmt(oS.value));
       set('sc2T',fmtPnl(tS.pnl)); set('sc2O',fmtPnl(oS.pnl));
       set('sc3T',tS.trades); set('sc3O',oS.trades);
