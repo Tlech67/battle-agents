@@ -943,8 +943,31 @@ window.loadAll=function(){
     });
 };
 
-loadAll();
-setInterval(loadAll,60000);
+// ── AUTO-FREEZE AT THE FINAL BELL ─────────────────────────────
+// After CONTEST_END the dashboard stops polling and locks the numbers so it
+// can't keep flip-flopping the leader on market noise. One last render, then
+// it's frozen — no action needed at the exact moment the contest ends.
+var CONTEST_END = new Date('2026-08-13T23:59:59-07:00'); // Pacific
+var _frozen = false;
+var _loop = null;
+function tickOrFreeze(){
+  if(new Date() >= CONTEST_END){
+    if(!_frozen){ _frozen = true; loadAll(); setTimeout(freezeUI, 4000); }
+    return;
+  }
+  loadAll();
+}
+function freezeUI(){
+  if(_loop){ clearInterval(_loop); _loop = null; }
+  var pill = document.querySelector('.status-pill');
+  if(pill){ pill.innerHTML='&#9632; FINAL'; pill.style.background='#2a1f0a'; pill.style.color='#f0883e'; pill.style.borderColor='#6e4a0a'; }
+  var lu = document.getElementById('lastUpdate');
+  if(lu) lu.textContent='Round 1 final \u2014 Aug 13, 2026';
+  var rb = document.querySelector('.refresh-btn');
+  if(rb) rb.style.display='none';
+}
+tickOrFreeze();
+_loop = setInterval(tickOrFreeze, 60000);
 
 // ── COIN CHECK TAB (Omar's personal lookup) ──────────────────
 // Reuses sentiment(), PROXY, playClick from above. Watchlist
