@@ -126,6 +126,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   <div class="tabs">
     <button class="tab active" id="tab-btn-r1" onclick="showTab('r1')">Round 1 · Results</button>
     <button class="tab" id="tab-btn-r2" onclick="showTab('r2')">Round 2 · Preview</button>
+    <button class="tab" id="tab-btn-wr" onclick="showTab('wr')">War Room · Example</button>
   </div>
 
   <!-- ── ROUND 1 ── -->
@@ -181,6 +182,19 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
         <li><b>New strategies on the table.</b> Round 1's momentum and long-hold get company.</li>
         <li><b>More players in the ring.</b> The battle grows from a duel into a bracket.</li>
       </ul>
+    </div>
+  </div>
+
+  <!-- ── WAR ROOM (archived example) ── -->
+  <div class="panel" id="panel-wr">
+    <div class="card">
+      <div style="border:1px dashed rgba(240,136,62,0.55);background:rgba(240,136,62,0.08);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.55;color:var(--txt);">
+        <b style="color:var(--accent);">Archived example &mdash; not live.</b> This is the real-time War Room dashboard from Round 1 &mdash; the system that tracked both bots trading on Coinbase minute to minute. We&rsquo;re no longer actively trading off it, and the figures shown aren&rsquo;t reconciled to a final tally. It&rsquo;s here only to show what the live build looked like.
+      </div>
+      <iframe src="warroom.html" title="Battle of the Bots War Room — archived example" loading="lazy" style="width:100%;height:820px;border:1px solid var(--line);border-radius:12px;background:#0d1117;display:block;"></iframe>
+      <div style="text-align:center;margin-top:12px;">
+        <a href="warroom.html" target="_blank" rel="noopener" style="color:var(--omar);text-decoration:none;font-weight:600;font-size:14px;">Open the War Room full screen &rarr;</a>
+      </div>
     </div>
   </div>
 
@@ -316,7 +330,7 @@ function set(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
 
 // ── Tabs ──
 window.showTab=function(name){
-  ['r1','r2'].forEach(function(t){
+  ['r1','r2','wr'].forEach(function(t){
     var p=document.getElementById('panel-'+t), b=document.getElementById('tab-btn-'+t);
     if(p) p.className='panel'+(t===name?' active':'');
     if(b) b.className='tab'+(t===name?' active':'');
