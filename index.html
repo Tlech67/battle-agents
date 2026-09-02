@@ -213,7 +213,7 @@ var CONTEST = {
   },
 
   round2: {
-    when: 'Starts September 1, 2026',    // ← e.g. 'Fall 2026' or a date
+    when: 'Starts September 15, 2026',   // ← e.g. 'Fall 2026' or a date
     roster: [                            // ← add the new challengers (name + color: teresa/omar/gold)
       { name: 'Teresa', color: 'teresa' },
       { name: 'Omar',   color: 'omar'   },
@@ -296,7 +296,7 @@ function set(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
 (function(){
   set('r2When', CONTEST.round2.when);
   (function r2tick(){
-    var start = new Date('2026-09-01T00:00:00');
+    var start = new Date('2026-09-15T00:00:00');
     var el = document.getElementById('r2Countdown');
     if(!el) return;
     var diff = start - new Date();
