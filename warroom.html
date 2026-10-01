@@ -464,9 +464,10 @@ var SHEET_ID     = '1fFf7uBS1qbHg_pedn_tQzVUhrtpOimgdjj7hfWTTzZ4';
 var SHEET_URL    = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Battle%20Scorecard';
 var PROXY        = 'https://api.allorigins.win/raw?url=';
 var PROXY2       = 'https://corsproxy.io/?url=';
-var START_T      = 356.99;
-var START_O      = 356.99;
-var TOTAL_START  = 713.98;
+var START_T      = 250;        // Round 2 — Teresa's fresh stake
+var START_O      = 825.36;      // Round 2 — Omar's carried-over war chest
+var TOTAL_START  = 1075.36;
+var R2_RESET     = new Date(2026,8,15,0,0,0);  // Sep 15 2026 — anything on/after this is Round 2
 var BATTLE_START = new Date('2026-10-01T00:00:00');
 var BATTLE_END   = new Date('2026-12-30T23:59:59');
 
@@ -588,8 +589,11 @@ function loadSheet(){
         coin:r.c[3]?r.c[3].v:'', qty:r.c[4]?parseFloat(r.c[4].v):0,
         price:r.c[5]?parseFloat(r.c[5].v):0, tradeVal:r.c[6]?parseFloat(r.c[6].v):0,
         cash:r.c[7]?parseFloat(r.c[7].v):0, portVal:r.c[8]?parseFloat(r.c[8].v):0,
+        pnl:r.c[9]?parseFloat(r.c[9].v):0,
+        pnlPct:r.c[10]?parseFloat(String(r.c[10].v).replace('%','')):0,
         trades:r.c[11]?parseInt(r.c[11].v):0, notes:r.c[12]?r.c[12].v:''
-      }}).filter(function(t){return t.agent&&t.action});
+      }}).filter(function(t){return t.agent&&t.action})
+        .filter(function(t){var d=parseGDate(t.time);return !d||d>=R2_RESET;});  // Round 2 rows only
       var tT=trades.filter(function(t){return t.agent==='TERESA'});
       var oT=trades.filter(function(t){return t.agent==='OMAR'});
       return{trades:trades,tT:tT,oT:oT,tLast:tT.length?tT[tT.length-1]:null,oLast:oT.length?oT[oT.length-1]:null};
@@ -857,6 +861,17 @@ function loadStocks(){
   });
 }
 
+// Round 2: per-coin holdings aren't carried in the sheet, so show the
+// accurate aggregate (value - cash) instead of reconstructing coins.
+function renderInvested(id,s){
+  var el=document.getElementById(id); if(!el)return;
+  var inv=s.invested||0;
+  if(inv<0.01){ el.innerHTML='<div class="empty">All cash &mdash; nothing deployed yet</div>'; return; }
+  el.innerHTML=
+    '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;"><span style="color:#7d8590;">Invested in positions</span><b style="color:#e6edf3;">'+fmt(inv)+'</b></div>'+
+    '<div style="font-size:10px;color:#7d8590;margin-top:4px;font-style:italic;">Individual coins are valued live inside the portfolio total above.</div>';
+}
+
 window.loadAll=function(){
   set('lastUpdate','Refreshing...');
   playClick();
@@ -889,8 +904,8 @@ window.loadAll=function(){
       renderPrices(prices);
 
       // Agent states
-      var tS={value:START_T,cash:START_T,pnl:0,pnlPct:0,trades:0,last:'Battle started May 17',holdings:{}};
-      var oS={value:START_O,cash:START_O,pnl:0,pnlPct:0,trades:0,last:'Battle started May 17',holdings:{}};
+      var tS={value:START_T,cash:START_T,pnl:0,pnlPct:0,trades:0,last:'Round 2 — started Oct 1',invested:0};
+      var oS={value:START_O,cash:START_O,pnl:0,pnlPct:0,trades:0,last:'Round 2 — started Oct 1',invested:0};
 
       if(sheet){
         var trades=sheet.trades, tT=sheet.tT, oT=sheet.oT, tLast=sheet.tLast, oLast=sheet.oLast;
@@ -904,19 +919,20 @@ window.loadAll=function(){
         }
         lastTradeCount=nc;
 
+        // Read the ENGINE's authoritative numbers straight from the sheet
+        // (portfolio value = cash + live-valued holdings, incl. carried-over).
+        // No reconstruction from trades — that double-counted and missed carryover.
         if(tLast){
           tS.cash=tLast.cash; tS.trades=tLast.trades;
           tS.last='Last: '+tLast.action+' '+tLast.coin+' @ '+fmt(tLast.price);
-          tS.holdings=buildHoldings(tT);
-          var thv=Object.keys(tS.holdings).reduce(function(s,c){var h=tS.holdings[c],p=prices[c];return s+(p?h.qty*p.price:h.qty*h.avgPrice)},0);
-          tS.value=tLast.cash+thv; tS.pnl=tS.value-START_T; tS.pnlPct=tS.pnl/START_T*100;
+          tS.value=tLast.portVal; tS.pnl=tLast.pnl; tS.pnlPct=tLast.pnlPct;
+          tS.invested=Math.max(tS.value-tS.cash,0);
         }
         if(oLast){
           oS.cash=oLast.cash; oS.trades=oLast.trades;
           oS.last='Last: '+oLast.action+' '+oLast.coin+' @ '+fmt(oLast.price);
-          oS.holdings=buildHoldings(oT);
-          var ohv=Object.keys(oS.holdings).reduce(function(s,c){var h=oS.holdings[c],p=prices[c];return s+(p?h.qty*p.price:h.qty*h.avgPrice)},0);
-          oS.value=oLast.cash+ohv; oS.pnl=oS.value-START_O; oS.pnlPct=oS.pnl/START_O*100;
+          oS.value=oLast.portVal; oS.pnl=oLast.pnl; oS.pnlPct=oLast.pnlPct;
+          oS.invested=Math.max(oS.value-oS.cash,0);
         }
         renderTrades(trades);
         renderChart(tT,oT);
@@ -934,8 +950,8 @@ window.loadAll=function(){
         el.className='f-pnl '+(s.pnl>0?'up':s.pnl<0?'dn':'flat');
       });
 
-      renderHoldings('tHoldings',tS.holdings,prices);
-      renderHoldings('oHoldings',oS.holdings,prices);
+      renderInvested('tHoldings',tS);
+      renderInvested('oHoldings',oS);
 
       // VS panel
       var margin=Math.abs(tS.value-oS.value);
