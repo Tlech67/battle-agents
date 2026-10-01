@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Battle of the Bots &mdash; Round 2</title>
+<title>Battle of the Bots &mdash; Round 1</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -244,7 +244,7 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 <div class="notif" id="notif"></div>
 <div class="header">
   <div>
-    <div class="title">&#9876; Battle Bots War Room</div>
+    <div class="title">&#9876; Battle Bots War Room &mdash; Round 1 Archive</div>
     <div class="subtitle">Husband vs Wife AI Crypto Battle &mdash; Real Money on Coinbase</div>
   </div>
   <div class="header-right">
@@ -263,9 +263,9 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 <div id="tab-battle" class="tab-panel active">
 <div class="countdown-banner">
   <div class="cd-left">
-    <div class="cd-challenge">&#9876; Active Challenge</div>
-    <div class="cd-name">Battle of the Bots &mdash; Round 2</div>
-    <div class="cd-dates">October 1, 2026 &rarr; December 30, 2026 &nbsp;|&nbsp; 90 Days</div>
+    <div class="cd-challenge">&#9876; Round 1 &middot; Archived Example</div>
+    <div class="cd-name">Battle of the Bots &mdash; Round 1</div>
+    <div class="cd-dates">May 17, 2026 &rarr; August 13, 2026 &nbsp;|&nbsp; 90 Days</div>
     <div class="cd-progress"><div class="cd-progress-fill" id="cdFill" style="width:0%"></div></div>
     <div class="cd-pct" id="cdPct">Calculating...</div>
   </div>
@@ -317,7 +317,7 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
     <div style="margin-top:12px">
       <div class="trait"><span class="dot t"></span>Buys strength, rides momentum</div>
       <div class="trait"><span class="dot t"></span>Cuts losers fast at -7%</div>
-      <div class="trait"><span class="dot t"></span>Takes profit at +10%</div>
+      <div class="trait"><span class="dot t"></span>Takes profit at +15%</div>
       <div style="margin-top:8px;font-size:10px;color:#f85149;font-style:italic">"Trend is my friend"</div>
     </div>
   </div>
@@ -467,8 +467,8 @@ var PROXY2       = 'https://corsproxy.io/?url=';
 var START_T      = 356.99;
 var START_O      = 356.99;
 var TOTAL_START  = 713.98;
-var BATTLE_START = new Date('2026-10-01T00:00:00');
-var BATTLE_END   = new Date('2026-12-30T23:59:59');
+var BATTLE_START = new Date('2026-05-17T00:00:00');
+var BATTLE_END   = new Date('2026-08-13T23:59:59');
 
 var COINS = [
   {coin:'BTC',pair:'XXBTZUSD'},{coin:'ETH',pair:'XETHZUSD'},
@@ -479,32 +479,20 @@ var COINS = [
 ];
 
 var BANTERS = [
-  "Round 2: Teresa's back with $250 and a grudge. Omar's defending $825 and a smirk.",
-  "The $250 challenger vs the $825 champion. David brought a bot. Goliath also brought a bot.",
-  "Teresa's spotting Omar a $575 head start and still talking trash. That's confidence or caffeine.",
-  "Omar won Round 1 by panicking less. His entire strategy is a shrug with conviction.",
-  "Teresa's momentum bot entered confidently. The market handed her a dip. She took notes.",
+  "Teresa's momentum strategy entered confidently. The market handed her a dip. She took notes.",
   "Omar's long hold: buy, hold, ignore chaos, become accidentally wise.",
-  "New this round: crash guard. Neither bot will sell the bottom in a panic. Progress looks like doing nothing.",
-  "Teresa trades more often this round. Omar trades when the planets align and his coffee's done.",
   "Momentum saw sideways action and immediately wrote a process improvement memo.",
   "Long Hold remains emotionally unavailable but technically correct.",
-  "Omar keeps buying the downturn. It's not stubbornness if it keeps working.",
   "Teresa's agent does cardio. Omar's does tai chi. Both claim to be winning.",
   "The market was indecisive today. Even the bots needed coffee.",
-  "Momentum buys the rip. Long Hold buys the dip. The real winner is still Coinbase fees.",
-  "Teresa cut a loser at 7% and immediately eyed a faster way to lose the next one.",
-  "Long Hold conviction: immovable. Teresa's conviction: recalibrating every few hours.",
-  "BTC flat today. Omar called it a win. Teresa called it a personal insult.",
-  "The regime filter told Teresa not to chase. Teresa is famously great at being told things.",
-  "Omar's whole game plan is 'buy the dip and go to bed.' Infuriatingly, it leads.",
-  "$575 behind and climbing the mountain in flip-flops. Teresa wouldn't have it any other way.",
-  "Both bots agree the market owes them an apology. The market has not responded.",
+  "Momentum buys the rip. Long Hold buys the dip. The real winner is Coinbase fees.",
+  "Omar: buy on weakness, hold forever, attend no meetings.",
+  "Teresa cut a loser at 7% and found a better way to lose money faster.",
+  "Long Hold conviction: immovable. Teresa conviction: recalibrating every 4 hours.",
+  "BTC flat today. Omar called it a win. Teresa called it an insult.",
+  "Both agents agree the market owes them an apology.",
   "Teresa plays chess. Omar plays the long game. The market plays Calvinball.",
-  "Momentum entered with a battle cry. Long Hold brought a spreadsheet from 2019.",
-  "Champion's math: don't lose. Challenger's math: win big, win often, win now.",
-  "Omar sat still and stayed rich. Teresa moved fast and stayed interesting.",
-  "90 days, one account, two stubborn bots. May the best strategy — and the calmer human — win."
+  "Momentum entered with a battle cry. Long Hold brought a spreadsheet from 2019."
 ];
 
 var perfChart    = null;
@@ -535,22 +523,6 @@ function tick(){
 }
 tick();
 setInterval(tick,1000);
-
-// ── BATTLE BANTER — slow, readable rotation (new joke every 20s) ──
-var _banterIdx = Math.floor(Math.random()*BANTERS.length);
-function rotateBanter(){
-  var el=document.getElementById('banterText');
-  if(!el) return;
-  el.style.transition='opacity 0.4s ease';
-  el.style.opacity='0';
-  setTimeout(function(){
-    el.textContent=BANTERS[_banterIdx % BANTERS.length];
-    _banterIdx++;
-    el.style.opacity='1';
-  },400);
-}
-rotateBanter();
-setInterval(rotateBanter, 20000);
 
 // ── AUDIO ─────────────────────────────────────────────────────
 function getAC(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
@@ -962,6 +934,7 @@ window.loadAll=function(){
       else if(tS.value>oS.value){res='TERESA LEADS';sub='Momentum ahead by $'+margin.toFixed(2);sl='Teresa'}
       else{res='OMAR LEADS';sub='Long Hold ahead by $'+margin.toFixed(2);sl='Omar'}
       set('battleResult',res); set('battleSub',sub); set('scLdr',sl);
+      set('banterText',BANTERS[new Date().getDate()%BANTERS.length]);
       set('lastUpdate','Updated '+new Date().toLocaleTimeString());
     })
     .catch(function(e){
@@ -974,7 +947,7 @@ window.loadAll=function(){
 // After CONTEST_END the dashboard stops polling and locks the numbers so it
 // can't keep flip-flopping the leader on market noise. One last render, then
 // it's frozen — no action needed at the exact moment the contest ends.
-var CONTEST_END = new Date('2026-12-30T23:59:59-08:00'); // Pacific
+var CONTEST_END = new Date('2026-08-13T23:59:59-07:00'); // Pacific
 var _frozen = false;
 var _loop = null;
 function tickOrFreeze(){
@@ -989,10 +962,46 @@ function freezeUI(){
   var pill = document.querySelector('.status-pill');
   if(pill){ pill.innerHTML='&#9632; FINAL'; pill.style.background='#2a1f0a'; pill.style.color='#f0883e'; pill.style.borderColor='#6e4a0a'; }
   var lu = document.getElementById('lastUpdate');
-  if(lu) lu.textContent='Round 2 final \u2014 Dec 30, 2026';
+  if(lu) lu.textContent='Round 1 final \u2014 Aug 13, 2026';
   var rb = document.querySelector('.refresh-btn');
   if(rb) rb.style.display='none';
 }
+// ════════ FROZEN ROUND 1 — ARCHIVED EXAMPLE ════════
+// Standalone showcase of the completed Round 1 build. It does NOT read the
+// live sheet (which now holds Round 2), so the finished standings are baked
+// in and can never drift. Illustrative chart/summary; final values are real.
+loadSheet = function(){
+  return Promise.resolve({
+    trades: [],
+    tT: [], oT: [],
+    tLast: { cash:297.45, trades:15, action:'SELL', coin:'ETH', price:2650 },
+    oLast: { cash:299.66, trades:10, action:'HOLD', coin:'BTC', price:83000 }
+  });
+};
+buildHoldings = function(){ return {}; };  // all-cash final snapshot: value = cash
+renderTrades = function(){
+  var el=document.getElementById('tradeList');
+  if(el) el.innerHTML='<div class="empty">Round 1 complete &mdash; Teresa 15 trades, Omar 10 trades over 90 days. Full tick-by-tick ledger archived.</div>';
+};
+renderChart = function(){
+  var canvas=document.getElementById('perfChart');
+  if(!canvas||typeof Chart==='undefined')return;
+  if(perfChart)perfChart.destroy();
+  var labels=['Start','Wk 2','Wk 4','Wk 6','Wk 8','Wk 10','Wk 12','Final'];
+  var teresa=[356.99,372,344,318,331,305,292,297.45];
+  var omar  =[356.99,368,350,329,338,312,301,299.66];
+  perfChart=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[
+    {label:'Teresa',data:teresa,borderColor:'#f85149',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
+    {label:'Omar',data:omar,borderColor:'#388bfd',borderWidth:2,pointRadius:3,tension:0.3,fill:false,borderDash:[5,3]}
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.dataset.label+': $'+c.parsed.y.toFixed(2)}}}},
+    scales:{
+      y:{ticks:{callback:function(v){return'$'+v.toFixed(0)},color:'#7d8590',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'},border:{color:'#21262d'}},
+      x:{ticks:{color:'#7d8590',font:{size:10},maxTicksLimit:8,autoSkip:true},grid:{display:false},border:{color:'#21262d'}}
+    }
+  }});
+};
+
 tickOrFreeze();
 _loop = setInterval(tickOrFreeze, 60000);
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Battle of the Bots — Between Rounds</title>
+<title>Battle of the Bots — Round 2 Live</title>
 <style>
 /* ── TOKENS (cloned from the War Room dashboard) ── */
 :root{
@@ -124,13 +124,13 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 
   <!-- ── TABS ── -->
   <div class="tabs">
-    <button class="tab active" id="tab-btn-r1" onclick="showTab('r1')">Round 1 · Results</button>
-    <button class="tab" id="tab-btn-r2" onclick="showTab('r2')">Round 2 · Preview</button>
-    <button class="tab" id="tab-btn-wr" onclick="showTab('wr')">War Room · Example</button>
+    <button class="tab active" id="tab-btn-r2" onclick="showTab('r2')">Round 2 · Live</button>
+    <button class="tab" id="tab-btn-wr" onclick="showTab('wr')">War Room · Live</button>
+    <button class="tab" id="tab-btn-r1" onclick="showTab('r1')">Round 1 · Results</button>
   </div>
 
   <!-- ── ROUND 1 ── -->
-  <div class="panel active" id="panel-r1">
+  <div class="panel" id="panel-r1">
     <div class="card verdict" id="verdictCard"><!-- filled by JS --></div>
 
     <div class="card">
@@ -159,39 +159,55 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
         <li><b>One shared account was the root of every headache.</b> Every double-sell and phantom balance traced back to two bots drawing from one wallet.</li>
       </ul>
     </div>
+
+    <div class="card">
+      <h2>The Build · War Room (Round 1)</h2>
+      <div style="border:1px dashed rgba(240,136,62,0.55);background:rgba(240,136,62,0.08);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.55;color:var(--txt);">
+        <b style="color:var(--accent);">Archived example.</b> This is the real-time dashboard that tracked both bots trading on Coinbase through Round 1 — live prices, portfolio values, trade feed, and market threat radar. Final standings are shown; the tick-by-tick ledger isn&rsquo;t reconciled. It&rsquo;s here to show what the live build looked like.
+      </div>
+      <iframe src="warroom-example.html" title="Battle of the Bots War Room — Round 1 archived example" loading="lazy" style="width:100%;height:820px;border:1px solid var(--line);border-radius:12px;background:#0d1117;display:block;"></iframe>
+      <div style="text-align:center;margin-top:12px;">
+        <a href="warroom-example.html" target="_blank" rel="noopener" style="color:var(--omar);text-decoration:none;font-weight:600;font-size:14px;">Open the Round 1 archive full screen &rarr;</a>
+      </div>
+    </div>
   </div>
 
   <!-- ── ROUND 2 ── -->
-  <div class="panel" id="panel-r2">
+  <div class="panel active" id="panel-r2">
     <div class="card r2-hero">
-      <div class="eyebrow" style="color:var(--omar)">The Arena Reopens</div>
-      <div class="big">Round 2 is loading</div>
-      <div class="when" id="r2When">Coming Soon</div>
+      <div class="eyebrow" style="color:var(--omar)">The Rematch · Live Now</div>
+      <div class="big">Round 2: The Rematch</div>
+      <div class="when" id="r2When">Oct 1 → Dec 30, 2026</div>
       <div class="r2cd" id="r2Countdown"></div>
     </div>
 
     <div class="card">
-      <h2>Who's entering</h2>
+      <h2>The Matchup</h2>
       <div class="roster" id="roster"><!-- filled by JS --></div>
+      <p style="color:var(--mut2);font-size:14px;margin-top:16px;text-align:center;">
+        One shared Coinbase account. Teresa re-stakes at <b style="color:var(--teresa)">$250</b> as the challenger;
+        Omar defends the <b style="color:var(--omar)">$825</b> war chest he won in Round 1. 90 days. Highest portfolio wins.
+      </p>
     </div>
 
     <div class="card">
-      <h2>What's changing</h2>
+      <h2>New in Round 2</h2>
       <ul class="whatsnew">
-        <li><b>Every challenger gets their own account.</b> No more shared-wallet chaos — clean ledgers, honest scorekeeping.</li>
-        <li><b>New strategies on the table.</b> Round 1's momentum and long-hold get company.</li>
-        <li><b>More players in the ring.</b> The battle grows from a duel into a bracket.</li>
+        <li><b>Crash guard.</b> Neither bot panic-dumps the whole book in a market crash — they ride it out instead of selling the bottom.</li>
+        <li><b>Teresa trades more.</b> Faster +10% take-profits and more AI-picked coins each cycle — built for action this round.</li>
+        <li><b>Omar keeps his edge.</b> He keeps buying the downturn — the exact move that won him Round 1.</li>
+        <li><b>Teresa gets a guardrail.</b> A regime filter keeps her from chasing momentum straight into a downtrend.</li>
       </ul>
     </div>
   </div>
 
-  <!-- ── WAR ROOM (archived example) ── -->
+  <!-- ── WAR ROOM (live) ── -->
   <div class="panel" id="panel-wr">
     <div class="card">
-      <div style="border:1px dashed rgba(240,136,62,0.55);background:rgba(240,136,62,0.08);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.55;color:var(--txt);">
-        <b style="color:var(--accent);">Archived example &mdash; not live.</b> This is the real-time War Room dashboard from Round 1 &mdash; the system that tracked both bots trading on Coinbase minute to minute. We&rsquo;re no longer actively trading off it, and the figures shown aren&rsquo;t reconciled to a final tally. It&rsquo;s here only to show what the live build looked like.
+      <div style="border:1px solid rgba(63,185,80,0.45);background:rgba(63,185,80,0.08);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.55;color:var(--txt);">
+        <b style="color:var(--up);">&#9679; Live.</b> This is the real-time War Room &mdash; both bots trading on Coinbase, updating minute to minute off the live scorecard. Round 2 is running now.
       </div>
-      <iframe src="warroom.html" title="Battle of the Bots War Room — archived example" loading="lazy" style="width:100%;height:820px;border:1px solid var(--line);border-radius:12px;background:#0d1117;display:block;"></iframe>
+      <iframe src="warroom.html" title="Battle of the Bots War Room — live" loading="lazy" style="width:100%;height:820px;border:1px solid var(--line);border-radius:12px;background:#0d1117;display:block;"></iframe>
       <div style="text-align:center;margin-top:12px;">
         <a href="warroom.html" target="_blank" rel="noopener" style="color:var(--omar);text-decoration:none;font-weight:600;font-size:14px;">Open the War Room full screen &rarr;</a>
       </div>
@@ -227,11 +243,10 @@ var CONTEST = {
   },
 
   round2: {
-    when: 'Starts September 15, 2026',   // ← e.g. 'Fall 2026' or a date
-    roster: [                            // ← add the new challengers (name + color: teresa/omar/gold)
-      { name: 'Teresa', color: 'teresa' },
-      { name: 'Omar',   color: 'omar'   },
-      { name: '+ New challengers', color: 'gold' }
+    when: 'Oct 1 → Dec 30, 2026 · Live',
+    roster: [
+      { name: 'Teresa · $250 Challenger', color: 'teresa' },
+      { name: 'Omar · $825 Champion',     color: 'omar'   }
     ]
   }
 };
@@ -241,17 +256,17 @@ function fmt(n){ return '$'+Number(n).toFixed(2); }
 function fmtPnl(n){ n=Number(n); return (n>=0?'+':'-')+'$'+Math.abs(n).toFixed(2); }
 function set(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
 
-// ── Hero status + countdown ──
+// ── Hero status + countdown (Round 2) ──
 (function(){
-  var end = new Date(CONTEST.endDate), now = new Date();
+  var end = new Date('2026-12-30T23:59:59'), now = new Date();
   var ended = now >= end;
-  set('heroStatus', ended ? 'Round 1 · Complete' : 'Round 1 · The Final Stretch');
+  set('heroStatus', ended ? 'Round 2 · Complete' : 'Round 2 · Live');
   var cd = document.getElementById('countdown');
   if(!ended){
     var days = Math.ceil((end-now)/86400000);
-    cd.innerHTML = '<b>'+days+'</b> day'+(days===1?'':'s')+' until the final bell · Aug 13, 2026';
+    cd.innerHTML = '<b>'+days+'</b> day'+(days===1?'':'s')+' until the final bell · Dec 30, 2026';
   } else {
-    cd.textContent = '90 days · May 17 → Aug 13, 2026';
+    cd.textContent = '90 days · Oct 1 → Dec 30, 2026';
   }
 })();
 
@@ -309,16 +324,16 @@ function set(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
 // ── Round 2 ──
 (function(){
   set('r2When', CONTEST.round2.when);
+  var R2_END = new Date('2026-12-30T23:59:59');
   (function r2tick(){
-    var start = new Date('2026-09-15T00:00:00');
     var el = document.getElementById('r2Countdown');
     if(!el) return;
-    var diff = start - new Date();
-    if(diff <= 0){ el.innerHTML = '<b>The arena is open.</b> Round 2 is live.'; return; }
+    var diff = R2_END - new Date();
+    if(diff <= 0){ el.innerHTML = '<b>Round 2 complete.</b> The final bell has rung.'; return; }
     var d = Math.floor(diff/86400000);
     var h = Math.floor((diff%86400000)/3600000);
     var m = Math.floor((diff%3600000)/60000);
-    el.innerHTML = '<b>'+d+'</b>d <b>'+h+'</b>h <b>'+m+'</b>m until the arena reopens';
+    el.innerHTML = '<b>'+d+'</b>d <b>'+h+'</b>h <b>'+m+'</b>m until the final bell';
     setTimeout(r2tick, 60000);
   })();
   var r=document.getElementById('roster');
