@@ -258,12 +258,12 @@ function set(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
 
 // ── Hero status + countdown (Round 2) ──
 (function(){
-  var end = new Date('2026-12-30T23:59:59'), now = new Date();
+  var end = new Date('2026-12-30T23:59:59-07:00'), now = new Date();
   var ended = now >= end;
   set('heroStatus', ended ? 'Round 2 · Complete' : 'Round 2 · Live');
   var cd = document.getElementById('countdown');
   if(!ended){
-    var days = Math.ceil((end-now)/86400000);
+    var days = Math.floor((end-now)/86400000);
     cd.innerHTML = '<b>'+days+'</b> day'+(days===1?'':'s')+' until the final bell · Dec 30, 2026';
   } else {
     cd.textContent = '90 days · Oct 1 → Dec 30, 2026';
@@ -324,7 +324,7 @@ function set(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
 // ── Round 2 ──
 (function(){
   set('r2When', CONTEST.round2.when);
-  var R2_END = new Date('2026-12-30T23:59:59');
+  var R2_END = new Date('2026-12-30T23:59:59-07:00');
   (function r2tick(){
     var el = document.getElementById('r2Countdown');
     if(!el) return;

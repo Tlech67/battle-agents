@@ -468,8 +468,8 @@ var START_T      = 250;        // Round 2 — Teresa's fresh stake
 var START_O      = 825.36;      // Round 2 — Omar's carried-over war chest
 var TOTAL_START  = 1075.36;
 var R2_RESET     = new Date(2026,8,15,0,0,0);  // Sep 15 2026 — anything on/after this is Round 2
-var BATTLE_START = new Date('2026-10-01T00:00:00');
-var BATTLE_END   = new Date('2026-12-30T23:59:59');
+var BATTLE_START = new Date('2026-10-01T00:00:00-07:00');
+var BATTLE_END   = new Date('2026-12-30T23:59:59-07:00');  // -07:00 anchor avoids the DST fall-back hour inflating the day count
 
 var COINS = [
   {coin:'BTC',pair:'XXBTZUSD'},{coin:'ETH',pair:'XETHZUSD'},
