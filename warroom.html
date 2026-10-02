@@ -380,7 +380,7 @@ details.panel>summary .p-title{margin-bottom:0}
 </div>
 <div class="grid2">
   <details class="panel">
-    <summary><span class="p-title">Live Prices &mdash; 10-Coin Battle Universe</span></summary>
+    <summary><span class="p-title">Live Prices &mdash; 11-Coin Battle Universe</span></summary>
     <div class="price-help">
       Each bar reads today's price momentum (current vs. the day's open) &mdash; a quick gauge of direction, not a buy signal.<br>
       <span class="lg"><span class="sw weak"></span>Weak &le; &minus;1.5%</span><span class="lg"><span class="sw neutral"></span>Neutral (flat)</span><span class="lg"><span class="sw strong"></span>Strong &ge; +1.5%</span>
@@ -484,7 +484,8 @@ var COINS = [
   {coin:'SOL',pair:'SOLUSD'},{coin:'AVAX',pair:'AVAXUSD'},
   {coin:'XRP',pair:'XXRPZUSD'},{coin:'DOGE',pair:'XDGUSD'},
   {coin:'LINK',pair:'LINKUSD'},{coin:'POL',pair:'POLUSD'},
-  {coin:'ADA',pair:'ADAUSD'},{coin:'DOT',pair:'DOTUSD'}
+  {coin:'ADA',pair:'ADAUSD'},{coin:'DOT',pair:'DOTUSD'},
+  {coin:'HYPE',pair:'HYPEUSD'}
 ];
 
 var BANTERS = [
@@ -802,7 +803,7 @@ var TICKER_CRYPTO=[
   {sym:'AVAX',pair:'AVAXUSD'},{sym:'XRP',pair:'XXRPZUSD'},
   {sym:'LINK',pair:'LINKUSD'},{sym:'BNB',pair:'BNBUSD'},
   {sym:'POL',pair:'POLUSD'},{sym:'ADA',pair:'ADAUSD'},
-  {sym:'DOT',pair:'DOTUSD'}
+  {sym:'DOT',pair:'DOTUSD'},{sym:'HYPE',pair:'HYPEUSD'}
 ];
 
 // ── STOCK TICKER (Yahoo Finance) ──────────────────────────────
@@ -884,9 +885,13 @@ function renderHoldingsLive(id,s,prices){
       return pb-pa;
     }).map(function(c){
       var qty=h[c].q||0, avg=h[c].a||0, p=(prices[c]&&prices[c].price)||avg, val=qty*p;
+      var pct=avg>0?((p-avg)/avg*100):0;
+      var color=pct>0.05?'#3fb950':pct<-0.05?'#f85149':'#7d8590';
+      var pctStr=(pct>=0?'+':'')+pct.toFixed(1)+'%';
       return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1c2128;font-size:13px">'
         +'<span style="color:#e6edf3;font-weight:600">'+c+' <span style="color:#7d8590;font-weight:400;font-size:11px">'+qty.toFixed(4)+'</span></span>'
-        +'<span style="color:#e6edf3">'+fmt(val)+'</span></div>';
+        +'<span style="text-align:right"><span style="color:#e6edf3">'+fmt(val)+'</span> <span style="color:'+color+';font-size:11px;font-weight:600;margin-left:6px">'+pctStr+'</span></span>'
+        +'</div>';
     }).join('');
     return;
   }
