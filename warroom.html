@@ -70,6 +70,13 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
 .panel{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px}
 .p-title{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7d8590;margin-bottom:12px}
+/* collapsible panels — tap the title to expand/collapse */
+details.panel>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
+details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary::after{content:'\25B8';color:#7d8590;font-size:12px;transition:transform .2s;margin-left:8px}
+details.panel[open]>summary::after{transform:rotate(90deg)}
+details.panel[open]>summary{margin-bottom:12px}
+details.panel>summary .p-title{margin-bottom:0}
 .price-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #21262d;font-size:13px}
 .price-row:last-child{border-bottom:none}
 .p-coin{color:#e6edf3;font-weight:500}
@@ -372,30 +379,30 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
   </div>
 </div>
 <div class="grid2">
-  <div class="panel">
-    <div class="p-title">Live Prices &mdash; 10-Coin Battle Universe</div>
+  <details class="panel">
+    <summary><span class="p-title">Live Prices &mdash; 10-Coin Battle Universe</span></summary>
     <div class="price-help">
       Each bar reads today's price momentum (current vs. the day's open) &mdash; a quick gauge of direction, not a buy signal.<br>
       <span class="lg"><span class="sw weak"></span>Weak &le; &minus;1.5%</span><span class="lg"><span class="sw neutral"></span>Neutral (flat)</span><span class="lg"><span class="sw strong"></span>Strong &ge; +1.5%</span>
     </div>
     <div id="priceList"><div class="empty">Loading prices...</div></div>
-  </div>
+  </details>
   <div class="panel">
     <div class="p-title">Recent Trades</div>
     <div id="tradeList"><div class="empty">No trades yet</div></div>
   </div>
 </div>
 <div class="grid2">
-  <div class="panel">
-    <div class="p-title">Teresa &mdash; Open Positions</div>
+  <details class="panel" open>
+    <summary><span class="p-title">Teresa &mdash; Open Positions</span></summary>
     <div id="tHoldings"><div class="empty">No open positions</div></div>
     <div class="cash-row"><span style="color:#7d8590">Cash available</span><span style="color:#e6edf3" id="tCash">--</span></div>
-  </div>
-  <div class="panel">
-    <div class="p-title">Omar &mdash; Open Positions</div>
+  </details>
+  <details class="panel" open>
+    <summary><span class="p-title">Omar &mdash; Open Positions</span></summary>
     <div id="oHoldings"><div class="empty">Waiting for dips</div></div>
     <div class="cash-row"><span style="color:#7d8590">Cash available</span><span style="color:#e6edf3" id="oCash">--</span></div>
-  </div>
+  </details>
 </div>
 <div class="chart-panel">
   <div class="p-title">Portfolio Performance Over Time</div>
@@ -415,14 +422,14 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
   </div>
 </div>
 <div class="grid2">
-  <div class="panel">
-    <div class="p-title">Market Threat Radar</div>
+  <details class="panel">
+    <summary><span class="p-title">Market Threat Radar</span></summary>
     <div class="threat-row"><span class="thr-name">CPI / Inflation data</span><span class="thr-lvl medium">Medium</span></div>
     <div class="threat-row"><span class="thr-name">Fed rate signals</span><span class="thr-lvl medium">Medium</span></div>
     <div class="threat-row"><span class="thr-name">BTC ETF net flows</span><span class="thr-lvl low">Low</span></div>
     <div class="threat-row"><span class="thr-name">Crypto regulation news</span><span class="thr-lvl medium">Medium</span></div>
     <div class="threat-row"><span class="thr-name">Altcoin liquidations</span><span class="thr-lvl" id="liqLevel">Low</span></div>
-  </div>
+  </details>
   <div class="panel">
     <div class="p-title">Today's Battle Result</div>
     <div class="result-big" id="battleResult">--</div>
@@ -430,6 +437,7 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFo
     <table class="score-table">
       <tr><td>Portfolio</td><td id="sc1T">--</td><td id="sc1O">--</td></tr>
       <tr><td>P&amp;L</td><td id="sc2T">--</td><td id="sc2O">--</td></tr>
+      <tr style="color:#e6edf3;font-weight:700"><td>Return % &mdash; decides winner</td><td id="sc4T">--</td><td id="sc4O">--</td></tr>
       <tr><td>Trades</td><td id="sc3T">--</td><td id="sc3O">--</td></tr>
       <tr class="score-total"><td>Leader</td><td colspan="2" id="scLdr" style="text-align:right">--</td></tr>
     </table>
@@ -565,7 +573,7 @@ window.toggleSound=function(){soundOn=!soundOn;var b=document.getElementById('so
 // ── UTILS ─────────────────────────────────────────────────────
 function showNotif(msg,type){var el=document.getElementById('notif');el.textContent=msg;el.className='notif show '+(type||'');clearTimeout(el._t);el._t=setTimeout(function(){el.className='notif'},3500)}
 function fmt(n){return'$'+parseFloat(n).toFixed(2)}
-function fmtPnl(n){n=parseFloat(n);return(n>=0?'+':'')+fmt(Math.abs(n))}
+function fmtPnl(n){n=parseFloat(n);return(n>=0?'+':'-')+fmt(Math.abs(n))}
 function fmtPct(n){n=parseFloat(n);return(n>=0?'+':'')+n.toFixed(2)+'%'}
 function set(id,val){var el=document.getElementById(id);if(el)el.textContent=val}
 function parseGDate(v){
@@ -591,7 +599,8 @@ function loadSheet(){
         cash:r.c[7]?parseFloat(r.c[7].v):0, portVal:r.c[8]?parseFloat(r.c[8].v):0,
         pnl:r.c[9]?parseFloat(r.c[9].v):0,
         pnlPct:r.c[10]?parseFloat(String(r.c[10].v).replace('%','')):0,
-        trades:r.c[11]?parseInt(r.c[11].v):0, notes:r.c[12]?r.c[12].v:''
+        trades:r.c[11]?parseInt(r.c[11].v):0, notes:r.c[12]?r.c[12].v:'',
+        holdings:(r.c[14]&&r.c[14].v)?r.c[14].v:''
       }}).filter(function(t){return t.agent&&t.action})
         .filter(function(t){var d=parseGDate(t.time);return !d||d>=R2_RESET;});  // Round 2 rows only
       var tT=trades.filter(function(t){return t.agent==='TERESA'});
@@ -861,15 +870,31 @@ function loadStocks(){
   });
 }
 
-// Round 2: per-coin holdings aren't carried in the sheet, so show the
-// accurate aggregate (value - cash) instead of reconstructing coins.
-function renderInvested(id,s){
+function parseHoldings(str){ if(!str)return null; try{var o=JSON.parse(str);return (o&&typeof o==='object')?o:null;}catch(e){return null;} }
+
+// Per-coin positions, valued live. The engine writes each agent's holdings to
+// the sheet; until the first write lands we fall back to the invested total.
+function renderHoldingsLive(id,s,prices){
   var el=document.getElementById(id); if(!el)return;
+  var h=s.holdingsObj;
+  if(h && Object.keys(h).length){
+    el.innerHTML=Object.keys(h).sort(function(a,b){
+      var pa=(h[a].q||0)*((prices[a]&&prices[a].price)||h[a].a||0);
+      var pb=(h[b].q||0)*((prices[b]&&prices[b].price)||h[b].a||0);
+      return pb-pa;
+    }).map(function(c){
+      var qty=h[c].q||0, avg=h[c].a||0, p=(prices[c]&&prices[c].price)||avg, val=qty*p;
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1c2128;font-size:13px">'
+        +'<span style="color:#e6edf3;font-weight:600">'+c+' <span style="color:#7d8590;font-weight:400;font-size:11px">'+qty.toFixed(4)+'</span></span>'
+        +'<span style="color:#e6edf3">'+fmt(val)+'</span></div>';
+    }).join('');
+    return;
+  }
   var inv=s.invested||0;
-  if(inv<0.01){ el.innerHTML='<div class="empty">All cash &mdash; nothing deployed yet</div>'; return; }
-  el.innerHTML=
-    '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;"><span style="color:#7d8590;">Invested in positions</span><b style="color:#e6edf3;">'+fmt(inv)+'</b></div>'+
-    '<div style="font-size:10px;color:#7d8590;margin-top:4px;font-style:italic;">Individual coins are valued live inside the portfolio total above.</div>';
+  el.innerHTML = inv<0.01
+    ? '<div class="empty">All cash &mdash; nothing deployed yet</div>'
+    : '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px"><span style="color:#7d8590">Invested in positions</span><b style="color:#e6edf3">'+fmt(inv)+'</b></div>'
+      +'<div style="font-size:10px;color:#7d8590;margin-top:4px;font-style:italic">Per-coin detail appears after the next engine cycle writes holdings.</div>';
 }
 
 window.loadAll=function(){
@@ -927,12 +952,14 @@ window.loadAll=function(){
           tS.last='Last: '+tLast.action+' '+tLast.coin+' @ '+fmt(tLast.price);
           tS.value=tLast.portVal; tS.pnl=tLast.pnl; tS.pnlPct=tLast.pnlPct;
           tS.invested=Math.max(tS.value-tS.cash,0);
+          tS.holdingsObj=parseHoldings(tLast.holdings);
         }
         if(oLast){
           oS.cash=oLast.cash; oS.trades=oLast.trades;
           oS.last='Last: '+oLast.action+' '+oLast.coin+' @ '+fmt(oLast.price);
           oS.value=oLast.portVal; oS.pnl=oLast.pnl; oS.pnlPct=oLast.pnlPct;
           oS.invested=Math.max(oS.value-oS.cash,0);
+          oS.holdingsObj=parseHoldings(oLast.holdings);
         }
         renderTrades(trades);
         renderChart(tT,oT);
@@ -950,15 +977,16 @@ window.loadAll=function(){
         el.className='f-pnl '+(s.pnl>0?'up':s.pnl<0?'dn':'flat');
       });
 
-      renderInvested('tHoldings',tS);
-      renderInvested('oHoldings',oS);
+      renderHoldingsLive('tHoldings',tS,prices);
+      renderHoldingsLive('oHoldings',oS,prices);
 
       // VS panel
-      var margin=Math.abs(tS.value-oS.value);
-      set('vsGap',margin<0.01?'Dead even':'$'+margin.toFixed(2)+' gap');
+      // WIN CONDITION: best P&L % return (levels Teresa's $250 vs Omar's $825)
+      var margin=Math.abs(tS.pnlPct-oS.pnlPct);
+      set('vsGap',margin<0.01?'Dead even':margin.toFixed(2)+' pts apart');
       var ldr=document.getElementById('vsLdr'), nl='tie';
-      if(tS.value>oS.value){ldr.textContent='Teresa Leading';ldr.className='vs-ldr t';document.getElementById('tWinBadge').style.display='inline';document.getElementById('oWinBadge').style.display='none';nl='teresa'}
-      else if(oS.value>tS.value){ldr.textContent='Omar Leading';ldr.className='vs-ldr o';document.getElementById('oWinBadge').style.display='inline';document.getElementById('tWinBadge').style.display='none';nl='omar'}
+      if(tS.pnlPct>oS.pnlPct){ldr.textContent='Teresa Leading';ldr.className='vs-ldr t';document.getElementById('tWinBadge').style.display='inline';document.getElementById('oWinBadge').style.display='none';nl='teresa'}
+      else if(oS.pnlPct>tS.pnlPct){ldr.textContent='Omar Leading';ldr.className='vs-ldr o';document.getElementById('oWinBadge').style.display='inline';document.getElementById('tWinBadge').style.display='none';nl='omar'}
       else{ldr.textContent='Tied';ldr.className='vs-ldr tie';document.getElementById('tWinBadge').style.display='none';document.getElementById('oWinBadge').style.display='none'}
       if(lastLeader&&lastLeader!==nl&&nl!=='tie'){playLevelUp();showNotif('LEAD CHANGE! '+(nl==='teresa'?'Teresa':'Omar')+' takes the lead!','win')}
       lastLeader=nl;
@@ -966,17 +994,18 @@ window.loadAll=function(){
       // Battle fund
       var combined=tS.value+oS.value, cp=combined-TOTAL_START;
       set('combined',fmt(combined));
-      set('combinedPnl',(cp>=0?'+':'')+fmt(Math.abs(cp))+' total');
+      set('combinedPnl',(cp>=0?'+':'-')+fmt(Math.abs(cp))+' total');
 
       // Score table
       set('sc1T',fmt(tS.value)); set('sc1O',fmt(oS.value));
       set('sc2T',fmtPnl(tS.pnl)); set('sc2O',fmtPnl(oS.pnl));
+      set('sc4T',fmtPct(tS.pnlPct)); set('sc4O',fmtPct(oS.pnlPct));
       set('sc3T',tS.trades); set('sc3O',oS.trades);
 
-      var m2=Math.abs(tS.pnl-oS.pnl), res, sub, sl;
-      if(m2<0.50){res='DRAW';sub='Market range-bound today';sl="Still anyone's fight"}
-      else if(tS.value>oS.value){res='TERESA LEADS';sub='Momentum ahead by $'+margin.toFixed(2);sl='Teresa'}
-      else{res='OMAR LEADS';sub='Long Hold ahead by $'+margin.toFixed(2);sl='Omar'}
+      var m2=Math.abs(tS.pnlPct-oS.pnlPct), res, sub, sl;
+      if(m2<0.05){res='DEAD HEAT';sub='Returns neck and neck';sl="Still anyone's race"}
+      else if(tS.pnlPct>oS.pnlPct){res='TERESA LEADS';sub='Momentum ahead by '+m2.toFixed(2)+' pts';sl='Teresa'}
+      else{res='OMAR LEADS';sub='Long Hold ahead by '+m2.toFixed(2)+' pts';sl='Omar'}
       set('battleResult',res); set('battleSub',sub); set('scLdr',sl);
       set('lastUpdate','Updated '+new Date().toLocaleTimeString());
     })
