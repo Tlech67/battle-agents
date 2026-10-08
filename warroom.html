@@ -470,6 +470,7 @@ details.panel>summary .p-title{margin-bottom:0}
 // ── CONFIG ────────────────────────────────────────────────────
 var SHEET_ID     = '1fFf7uBS1qbHg_pedn_tQzVUhrtpOimgdjj7hfWTTzZ4';
 var SHEET_URL    = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Battle%20Scorecard';
+var HISTORY_URL  = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=History';  // hourly snapshots for the perf chart (optional tab)
 var PROXY        = 'https://api.allorigins.win/raw?url=';
 var PROXY2       = 'https://corsproxy.io/?url=';
 var START_T      = 250;        // Round 2 — Teresa's fresh stake
@@ -608,6 +609,24 @@ function loadSheet(){
       var oT=trades.filter(function(t){return t.agent==='OMAR'});
       return{trades:trades,tT:tT,oT:oT,tLast:tT.length?tT[tT.length-1]:null,oLast:oT.length?oT[oT.length-1]:null};
     }).catch(function(e){console.error('Sheet:',e);return null});
+}
+
+// Hourly portfolio snapshots for the performance chart. Reads an optional
+// "History" tab (cols: timestamp, teresa_value, teresa_pnl_pct, omar_value,
+// omar_pnl_pct) written each hour by the engine. Returns [] if the tab is
+// absent or empty, so the chart falls back to the trade-row reconstruction.
+function loadHistory(){
+  return fetch(HISTORY_URL)
+    .then(function(r){return r.text()})
+    .then(function(t){
+      var j=JSON.parse(t.substring(47).slice(0,-2));
+      var rows=(j.table&&j.table.rows)||[];
+      return rows.map(function(r){return{
+        time:r.c[0]?r.c[0].v:'',
+        tVal:(r.c[1]&&r.c[1].v!=null)?parseFloat(r.c[1].v):null,
+        oVal:(r.c[3]&&r.c[3].v!=null)?parseFloat(r.c[3].v):null
+      }}).filter(function(h){return h.time&&h.tVal!=null&&h.oVal!=null;});
+    }).catch(function(){return[];});  // no History tab yet → chart uses trade rows
 }
 
 function loadOneCoin(coin,pair){
@@ -763,29 +782,47 @@ function renderTrades(trades){
   }).join('');
 }
 
-function renderChart(tT,oT){
+function fmtChartLabel(v){
+  var d=parseGDate(v);
+  if(!d)return String(v);
+  return(d.getMonth()+1)+'/'+(d.getDate())+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+function renderChart(tT,oT,history){
   var canvas=document.getElementById('perfChart');
   if(!canvas)return;
   if(perfChart)perfChart.destroy();
-  var allT=[];
-  tT.concat(oT).forEach(function(t){if(allT.indexOf(t.time)<0)allT.push(t.time)});
-  allT.sort();
-  var labels=['Start'].concat(allT.map(function(t){
-    var d=parseGDate(t);
-    if(!d)return t;
-    return(d.getMonth()+1)+'/'+(d.getDate())+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  }));
-  function series(trades,start){
-    var v=[start];
-    allT.forEach(function(time){
-      var match=trades.filter(function(t){return t.time===time});
-      v.push(match.length?match[match.length-1].portVal:v[v.length-1]);
+  var labels,tData,oData,ptRadius;
+  if(history&&history.length>=2){
+    // Preferred: true hourly curve from the History tab
+    history=history.slice().sort(function(a,b){
+      var da=parseGDate(a.time),db=parseGDate(b.time);
+      return(da?da.getTime():0)-(db?db.getTime():0);
     });
-    return v;
+    labels=history.map(function(h){return fmtChartLabel(h.time)});
+    tData=history.map(function(h){return h.tVal});
+    oData=history.map(function(h){return h.oVal});
+    ptRadius=history.length>40?0:2;  // hide dots once the series gets dense
+  } else {
+    // Fallback: reconstruct from trade rows (flat between trades)
+    var allT=[];
+    tT.concat(oT).forEach(function(t){if(allT.indexOf(t.time)<0)allT.push(t.time)});
+    allT.sort();
+    labels=['Start'].concat(allT.map(fmtChartLabel));
+    var series=function(trades,start){
+      var v=[start];
+      allT.forEach(function(time){
+        var match=trades.filter(function(t){return t.time===time});
+        v.push(match.length?match[match.length-1].portVal:v[v.length-1]);
+      });
+      return v;
+    };
+    tData=series(tT,START_T);
+    oData=series(oT,START_O);
+    ptRadius=3;
   }
   perfChart=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[
-    {label:'Teresa',data:series(tT,START_T),borderColor:'#f85149',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
-    {label:'Omar',data:series(oT,START_O),borderColor:'#388bfd',borderWidth:2,pointRadius:3,tension:0.3,fill:false,borderDash:[5,3]}
+    {label:'Teresa',data:tData,borderColor:'#f85149',borderWidth:2,pointRadius:ptRadius,tension:0.3,fill:false},
+    {label:'Omar',data:oData,borderColor:'#388bfd',borderWidth:2,pointRadius:ptRadius,tension:0.3,fill:false,borderDash:[5,3]}
   ]},options:{responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.dataset.label+': $'+c.parsed.y.toFixed(2)}}}},
     scales:{
@@ -907,9 +944,9 @@ window.loadAll=function(){
   playClick();
   loadStocks();
 
-  Promise.all([loadSheet(), loadPrices(), loadFG()])
+  Promise.all([loadSheet(), loadPrices(), loadFG(), loadHistory()])
     .then(function(res){
-      var sheet=res[0], prices=res[1], fg=res[2];
+      var sheet=res[0], prices=res[1], fg=res[2], history=res[3];
       livePrices=prices;
 
       // Fear & Greed
@@ -967,9 +1004,9 @@ window.loadAll=function(){
           oS.holdingsObj=parseHoldings(oLast.holdings);
         }
         renderTrades(trades);
-        renderChart(tT,oT);
+        renderChart(tT,oT,history);
       } else {
-        renderChart([],[]);
+        renderChart([],[],history);
       }
 
       // Fighter cards
