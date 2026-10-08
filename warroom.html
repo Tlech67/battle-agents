@@ -791,35 +791,33 @@ function renderChart(tT,oT,history){
   var canvas=document.getElementById('perfChart');
   if(!canvas)return;
   if(perfChart)perfChart.destroy();
-  var labels,tData,oData,ptRadius;
-  if(history&&history.length>=2){
-    // Preferred: true hourly curve from the History tab
-    history=history.slice().sort(function(a,b){
-      var da=parseGDate(a.time),db=parseGDate(b.time);
-      return(da?da.getTime():0)-(db?db.getTime():0);
-    });
-    labels=history.map(function(h){return fmtChartLabel(h.time)});
-    tData=history.map(function(h){return h.tVal});
-    oData=history.map(function(h){return h.oVal});
-    ptRadius=history.length>40?0:2;  // hide dots once the series gets dense
-  } else {
-    // Fallback: reconstruct from trade rows (flat between trades)
-    var allT=[];
-    tT.concat(oT).forEach(function(t){if(allT.indexOf(t.time)<0)allT.push(t.time)});
-    allT.sort();
-    labels=['Start'].concat(allT.map(fmtChartLabel));
-    var series=function(trades,start){
-      var v=[start];
-      allT.forEach(function(time){
-        var match=trades.filter(function(t){return t.time===time});
-        v.push(match.length?match[match.length-1].portVal:v[v.length-1]);
-      });
-      return v;
-    };
-    tData=series(tT,START_T);
-    oData=series(oT,START_O);
-    ptRadius=3;
+  history=history||[];
+  // Merge both sources onto ONE timeline: the trade rows give the Round 2
+  // spine (portfolio value at each trade), and the History tab adds hourly
+  // snapshots on top as they accrue. Neither replaces the other.
+  function ptsFor(trades,histKey){
+    var a=[];
+    trades.forEach(function(t){if(t.time)a.push({time:t.time,val:t.portVal});});
+    history.forEach(function(h){if(h.time&&h[histKey]!=null)a.push({time:h.time,val:h[histKey]});});
+    return a;
   }
+  var tPts=ptsFor(tT,'tVal'), oPts=ptsFor(oT,'oVal');
+  // Union of all timestamps, sorted chronologically.
+  var seen={}, timeline=[];
+  tPts.concat(oPts).forEach(function(p){if(!seen[p.time]){seen[p.time]=1;timeline.push(p.time);}});
+  timeline.sort(function(a,b){var da=parseGDate(a),db=parseGDate(b);return(da?da.getTime():0)-(db?db.getTime():0);});
+  // Carry each agent's last known value forward across the timeline.
+  function series(points,start){
+    var byTime={};
+    points.forEach(function(p){if(p.val!=null)byTime[p.time]=p.val;});
+    var out=[start], last=start;
+    timeline.forEach(function(tm){if(byTime[tm]!=null)last=byTime[tm];out.push(last);});
+    return out;
+  }
+  var labels=['Start'].concat(timeline.map(fmtChartLabel));
+  var tData=series(tPts,START_T);
+  var oData=series(oPts,START_O);
+  var ptRadius=timeline.length>40?0:2;
   perfChart=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[
     {label:'Teresa',data:tData,borderColor:'#f85149',borderWidth:2,pointRadius:ptRadius,tension:0.3,fill:false},
     {label:'Omar',data:oData,borderColor:'#388bfd',borderWidth:2,pointRadius:ptRadius,tension:0.3,fill:false,borderDash:[5,3]}
