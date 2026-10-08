@@ -599,7 +599,7 @@ function loadSheet(){
         price:r.c[5]?parseFloat(r.c[5].v):0, tradeVal:r.c[6]?parseFloat(r.c[6].v):0,
         cash:r.c[7]?parseFloat(r.c[7].v):0, portVal:r.c[8]?parseFloat(r.c[8].v):0,
         pnl:r.c[9]?parseFloat(r.c[9].v):0,
-        pnlPct:r.c[10]?parseFloat(String(r.c[10].v).replace('%','')):0,
+        pnlPct:r.c[10]?parseFloat(String(r.c[10].f!=null?r.c[10].f:r.c[10].v).replace('%','')):0,  // read formatted "-2.74%" not raw ratio -0.0274
         trades:r.c[11]?parseInt(r.c[11].v):0, notes:r.c[12]?r.c[12].v:'',
         holdings:(r.c[14]&&r.c[14].v)?r.c[14].v:''
       }}).filter(function(t){return t.agent&&t.action})
